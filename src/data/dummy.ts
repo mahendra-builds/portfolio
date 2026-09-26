@@ -1,9 +1,18 @@
 import { PortfolioData } from '@/types';
+import { realPortfolioData } from './real';
 
-export const portfolioData: PortfolioData = {
+/**
+ * Phase 18 Toggle:
+ * true  => Mahendra Rajput's Real Portfolio Data (Owner, Experience, Real Estate CRM, Job:Hub, Task Management, etc.)
+ * false => Original Reference Video Dummy Data
+ */
+export const USE_REAL_CONTENT = true;
+
+export const dummyPortfolioData: PortfolioData = {
   meta: {
     title: 'Waqas — Creative Developer & Motion Designer',
-    description: 'A modern, motion-heavy personal portfolio website showcasing creative development, UI/UX, and motion design.',
+    description:
+      'A modern, motion-heavy personal portfolio website showcasing creative development, UI/UX, and motion design.',
     author: 'Waqas',
   },
   navigation: [
@@ -47,7 +56,8 @@ export const portfolioData: PortfolioData = {
       { label: 'PROJECTS DONE', value: '10+' },
       { label: 'EDUCATION', value: 'INTERMEDIATE' },
     ],
-    portraitImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+    portraitImage:
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
   },
   expertise: {
     sectionNumber: '03',
@@ -62,7 +72,8 @@ export const portfolioData: PortfolioData = {
         title: 'Creative Development',
         desc: 'Building fast, responsive and scalable interfaces with modern frontend technologies.',
         tags: ['HTML', 'CSS', 'JAVASCRIPT', 'UI / MOTION'],
-        image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
+        image:
+          'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
       },
       {
         id: '02',
@@ -70,7 +81,8 @@ export const portfolioData: PortfolioData = {
         title: 'Motion & Interaction',
         desc: 'Turning static interfaces into expressive experiences through meaningful motion and micro-interactions.',
         tags: ['GSAP', 'SCROLLTRIGGER', 'LENIS', '3D / UI & UX'],
-        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+        image:
+          'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
       },
       {
         id: '03',
@@ -78,7 +90,8 @@ export const portfolioData: PortfolioData = {
         title: 'UI / UX Design',
         desc: 'Creating clean, system-driven design systems with strong hierarchy, usability, and a distinct visual personality.',
         tags: ['DESIGN', 'UX', 'PROTOTYPING', 'DESIGN SYSTEMS'],
-        image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+        image:
+          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
       },
       {
         id: '04',
@@ -86,7 +99,8 @@ export const portfolioData: PortfolioData = {
         title: 'Modern Web Apps',
         desc: 'Developing interactive applications with component-based architecture and dynamic data.',
         tags: ['REACT', 'NEXT.JS', 'TYPESCRIPT', 'TAILWIND'],
-        image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+        image:
+          'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
       },
     ],
     techStack: ['HTML', 'CSS', 'JavaScript', 'React JS', 'Lenis', 'GSAP', 'Firebase'],
@@ -107,7 +121,8 @@ export const portfolioData: PortfolioData = {
           'A modern visual identity and digital experience designed for a contemporary creative designer.',
         tags: ['HTML', 'Tailwind', 'JavaScript', 'GSAP'],
         link: 'https://portfolio-gd-1.netlify.app',
-        image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=900&q=80',
+        image:
+          'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=900&q=80',
         liveBadge: 'VIEW MASTERPIECE • LIVE DEMO • ',
       },
       {
@@ -119,7 +134,8 @@ export const portfolioData: PortfolioData = {
           'Interactive agency portfolio showcasing high-end visual production, directional typography, and fluid micro-interactions.',
         tags: ['Next.js', 'TypeScript', 'GSAP', 'Lenis'],
         link: '#',
-        image: 'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=900&q=80',
+        image:
+          'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=900&q=80',
         liveBadge: 'EXPLORE CASE STUDY • LIVE DEMO • ',
       },
       {
@@ -131,7 +147,8 @@ export const portfolioData: PortfolioData = {
           'A modern digital shopping experience designed for contemporary brands, bringing products, style, and seamless commerce together.',
         tags: ['React', 'Tailwind', 'GSAP', 'Lenis'],
         link: 'https://project-gazu.netlify.app',
-        image: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80',
+        image:
+          'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80',
         liveBadge: 'VIEW COLLECTION • LIVE DEMO • ',
       },
     ],
@@ -163,3 +180,5 @@ export const portfolioData: PortfolioData = {
     ],
   },
 };
+
+export const portfolioData: PortfolioData = USE_REAL_CONTENT ? realPortfolioData : dummyPortfolioData;
