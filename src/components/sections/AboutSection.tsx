@@ -5,7 +5,7 @@ import { portfolioData } from '@/data/dummy';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { ImageWrapper } from '@/components/ui/ImageWrapper';
 import { Label } from '@/components/ui/Label';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Download } from 'lucide-react';
 
 export const AboutSection: React.FC = () => {
   const { about } = portfolioData;
@@ -68,6 +68,20 @@ export const AboutSection: React.FC = () => {
               {about.bioParagraphs.map((para, i) => (
                 <p key={i}>{para}</p>
               ))}
+            </div>
+
+            {/* Download Resume / CV */}
+            <div>
+              <a
+                href="/mahendra-cv.pdf"
+                download="Mahendra_Rajput_CV.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-white text-neutral-900 font-semibold text-xs tracking-wider uppercase hover:bg-brand-accent hover:text-white transition-all duration-300 shadow-md hover:shadow-brand-accent/20 cursor-pointer"
+              >
+                <Download className="w-4 h-4 transition-transform group-hover:-translate-y-0.5" />
+                <span>Download Resume / CV</span>
+              </a>
             </div>
 
             {/* Compact Stats Grid */}
