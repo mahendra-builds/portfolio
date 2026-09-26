@@ -65,6 +65,11 @@ export interface PortfolioData {
       label: string;
       value: string;
     }[];
+    clients?: {
+      name: string;
+      url: string;
+      tag: string;
+    }[];
     portraitImage: string;
   };
   expertise: {

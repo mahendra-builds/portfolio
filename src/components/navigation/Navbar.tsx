@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { portfolioData } from '@/data/dummy';
 import { useCursor } from '@/context/CursorContext';
 import { Menu, X } from 'lucide-react';
@@ -11,13 +11,37 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ darkTheme = false }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isScrolledDark, setIsScrolledDark] = useState(darkTheme);
   const { setCursorVariant, resetCursor } = useCursor();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Determine if we've scrolled past the light hero section
+      const heroEl = document.getElementById('hero');
+      if (heroEl) {
+        const heroBottom = heroEl.getBoundingClientRect().bottom;
+        // When hero bottom is near the top of viewport (e.g. within 60px), switch to dark theme
+        setIsScrolledDark(heroBottom <= 80);
+      } else {
+        setIsScrolledDark(window.scrollY > 400);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const activeDark = isScrolledDark || darkTheme;
 
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-colors duration-500 py-6 px-6 md:px-12 flex items-center justify-between pointer-events-auto ${
-          darkTheme ? 'text-white' : 'text-brand-black'
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 px-6 md:px-12 flex items-center justify-between pointer-events-auto ${
+          activeDark
+            ? 'bg-[#090909]/85 backdrop-blur-md border-b border-white/10 shadow-2xl py-4 text-white'
+            : 'bg-transparent py-6 text-brand-black'
         }`}
       >
         {/* Brand / Signature Logo */}
@@ -36,7 +60,9 @@ export const Navbar: React.FC<NavbarProps> = ({ darkTheme = false }) => {
             <a
               key={item.label}
               href={item.href}
-              className="relative py-1 group overflow-hidden"
+              className={`relative py-1 group overflow-hidden transition-colors duration-300 ${
+                activeDark ? 'text-neutral-300 hover:text-white' : 'text-neutral-800 hover:text-black'
+              }`}
               onMouseEnter={() => setCursorVariant('hover')}
               onMouseLeave={resetCursor}
             >
@@ -53,7 +79,9 @@ export const Navbar: React.FC<NavbarProps> = ({ darkTheme = false }) => {
         {/* Mobile Hamburger / Fullscreen Menu Toggle */}
         <button
           onClick={() => setIsMobileOpen(true)}
-          className="md:hidden p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+          className={`md:hidden p-2 rounded-full transition-colors ${
+            activeDark ? 'text-white hover:bg-white/10' : 'text-brand-black hover:bg-black/5'
+          }`}
           aria-label="Open menu"
         >
           <Menu className="w-6 h-6" />

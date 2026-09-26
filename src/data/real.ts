@@ -2,16 +2,16 @@ import { PortfolioData } from '@/types';
 
 export const realPortfolioData: PortfolioData = {
   meta: {
-    title: 'Mahendra Rajput — Creative Developer & Full Stack Engineer',
+    title: 'Mahendra Rajput — Full Stack & Linux Server Engineer',
     description:
-      'Personal portfolio of Mahendra Rajput showcasing web development, Drupal, Laravel, React, and motion-driven digital products.',
+      'Personal portfolio of Mahendra Rajput specializing in Drupal, Laravel, React, and Linux Server Administration.',
     author: 'Mahendra Rajput',
   },
   navigation: [
     { label: 'WORK', href: '#work' },
     { label: 'ABOUT', href: '#about' },
-    { label: 'EXPERIENCE', href: '#about' },
-    { label: 'SKILLS', href: '#expertise' },
+    { label: 'EXPERTISE', href: '#expertise' },
+    { label: 'CLIENTS', href: '#about' },
     { label: 'CONTACT', href: '#contact' },
   ],
   hero: {
@@ -19,107 +19,123 @@ export const realPortfolioData: PortfolioData = {
     yearText: '©2026 Mahendra Rajput',
     titlePrimary: 'CREATIVE',
     titleSecondary: 'DEVELOPER',
-    disciplines: ['FULL STACK', 'DRUPAL & LARAVEL', 'REACT & GSAP'],
+    disciplines: ['FULL STACK', 'DRUPAL & LARAVEL', 'LINUX & DEVOPS'],
     scrollPrompt: 'SCROLL TO EXPLORE',
     rotatingBadgeText: "LET'S WORK TOGETHER • LET'S WORK TOGETHER • ",
-    locationText: 'BASED IN INDIA • OPEN TO GLOBAL REMOTE',
+    locationText: 'BASED IN INDORE, INDIA • REMOTE AVAILABLE',
   },
   about: {
     sectionNumber: '02',
-    sectionSubtitle: 'THE ENGINEER BEHIND THE ARCHITECTURE',
+    sectionSubtitle: 'FULL STACK & SERVER ENGINEER',
     sectionTitle: 'ABOUT ME',
     tagline: 'WHO AM I ?',
     headline: {
       plain1: 'I BUILD ',
-      highlight1: 'ROBUST SYSTEMS',
-      plain2: ' WHERE ',
-      highlight2: 'PERFORMANCE',
-      plain3: ' MEETS ELEGANCE.',
+      highlight1: 'SCALABLE WEB APPS',
+      plain2: ' & ',
+      highlight2: 'ROBUST LINUX SERVERS',
+      plain3: '.',
     },
     bioParagraphs: [
-      "I'm Mahendra Rajput — a Full Stack & Creative Developer specializing in scalable enterprise applications, custom Drupal & Laravel architectures, and expressive interactive frontend experiences.",
-      'With professional experience across Codernaline LLP and Vidhya GXP, I engineer high-uptime REST APIs, OAuth2 integrations, and smooth web applications for prominent clients including VTPC, UCDC, and DB United.',
+      "I'm Mahendra Rajput, a Full Stack Developer & Linux Server Specialist based in Indore, India. I build enterprise platforms using Drupal, Laravel, and React with high-availability server infrastructures.",
+      'With hands-on experience at Codernaline LLP and Vidhya GXP, I manage end-to-end architectures: from custom CMS modules and secure REST APIs to Nginx proxies, Docker containers, and CI/CD pipelines.',
     ],
     stats: [
+      { label: 'LOCATION', value: 'INDORE, INDIA' },
       { label: 'EXPERIENCE', value: 'CODERNALINE & VIDHYA GXP' },
       { label: 'CORE STACK', value: 'DRUPAL, LARAVEL, REACT' },
-      { label: 'CONTAINERS', value: 'DOCKER & DDEV' },
-      { label: 'CLIENTS', value: 'VTPC, UCDC, DB UNITED' },
-      { label: 'DATABASE', value: 'MYSQL & REST APIS' },
-      { label: 'VERSION CONTROL', value: 'GIT & GITLAB CI' },
+      { label: 'SERVER & DEVOPS', value: 'LINUX, NGINX, DOCKER' },
+      { label: 'TOOLS', value: 'DDEV, GITLAB CI, MYSQL' },
+      { label: 'DATABASE & APIS', value: 'REST API & OAUTH2' },
     ],
-    portraitImage:
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80',
+    clients: [
+      {
+        name: 'VTPC',
+        url: 'https://www.vtpc.lv/',
+        tag: 'vtpc.lv',
+      },
+      {
+        name: 'UCDC',
+        url: 'https://www.ucdc.edu/',
+        tag: 'ucdc.edu',
+      },
+      {
+        name: 'DB United',
+        url: 'https://dbunited.co/',
+        tag: 'dbunited.co',
+      },
+    ],
+    portraitImage: '/images/mahendra-editorial.jpg',
   },
   expertise: {
     sectionNumber: '03',
     sectionTitle: 'SKILLS & EXPERTISE',
-    lead: 'Delivering end-to-end web engineering, from scalable backend microservices to reactive user interfaces.',
+    lead: 'High-performance backend development paired with enterprise Linux server management.',
     description:
-      'Specialized in PHP, Drupal architecture, Laravel backend APIs, Modern JavaScript, React applications, and Dockerized devops workflows.',
+      'Combining full stack engineering with deep server-level administration to deliver secure, resilient, and fast web infrastructure.',
     items: [
       {
         id: '01',
         category: 'BACKEND ARCHITECTURE',
         title: 'Drupal & Laravel Engineering',
-        desc: 'Custom module development, content modeling, enterprise CMS, and Laravel MVC service layers with OAuth2 authentication.',
+        desc: 'Custom module architecture, entity modeling, service layers, and enterprise CMS solutions.',
         tags: ['DRUPAL', 'PHP', 'LARAVEL', 'MYSQL'],
         image:
           'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
       },
       {
         id: '02',
-        category: 'FRONTEND & INTERACTION',
+        category: 'SERVER & INFRASTRUCTURE',
+        title: 'Linux Server Administration & DevOps',
+        desc: 'Ubuntu/Debian server setup, Nginx reverse proxies, Docker containers, DDEV environments, SSH security, and automated CI/CD.',
+        tags: ['LINUX', 'NGINX', 'DOCKER', 'DDEV', 'GITLAB CI'],
+        image:
+          'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80',
+      },
+      {
+        id: '03',
+        category: 'FRONTEND DEVELOPMENT',
         title: 'React & Interactive Web',
-        desc: 'Component-driven user interfaces, state management, GSAP motion choreography, and high-performance client rendering.',
-        tags: ['REACT', 'JAVASCRIPT', 'NEXT.JS', 'TAILWIND'],
+        desc: 'Modern component-driven SPAs, GSAP motion choreography, and high-performance user interfaces.',
+        tags: ['REACT', 'NEXT.JS', 'TYPESCRIPT', 'TAILWIND'],
         image:
           'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
       },
       {
-        id: '03',
-        category: 'INTEGRATIONS & APIS',
-        title: 'REST APIs & Security',
-        desc: 'Secure RESTful endpoint architectures, OAuth2 tokens, payment workflows, and seamless 3rd-party software connections.',
-        tags: ['REST API', 'OAUTH2', 'LINUX', 'SECURITY'],
-        image:
-          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-      },
-      {
         id: '04',
-        category: 'DEVOPS & WORKFLOWS',
-        title: 'Docker & CI/CD Pipelines',
-        desc: 'Local containerization with DDEV and Docker, GitLab CI pipelines, and optimized cloud deployment workflows.',
-        tags: ['DOCKER', 'DDEV', 'GITLAB CI', 'LINUX'],
+        category: 'APIS & SECURITY',
+        title: 'REST APIs & OAuth2 Integrations',
+        desc: 'Secure endpoint architectures, authentication flows, payment gateway integrations, and database optimization.',
+        tags: ['REST API', 'OAUTH2', 'SECURITY', 'MYSQL'],
         image:
           'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
       },
     ],
     techStack: [
+      'Linux Server',
+      'Nginx',
+      'Docker',
+      'DDEV',
       'Drupal',
       'PHP',
       'Laravel',
-      'JavaScript',
+      'MySQL',
       'React',
       'REST API',
       'OAuth2',
-      'MySQL',
-      'Docker',
-      'DDEV',
       'GitLab CI',
-      'Linux',
     ],
   },
   work: {
     sectionNumber: '04',
-    headerTag: 'FEATURED ARCHITECTURES & WORK',
+    headerTag: 'FEATURED ARCHITECTURES',
     giantWord: 'WORK',
     marqueeItems: [
       'DRUPAL CMS',
+      'LINUX SERVER OPS',
       'LARAVEL REST APIS',
       'REACT INTERFACES',
-      'DOCKER & DDEV',
-      'ENTERPRISE ARCHITECTURE',
+      'DOCKER & CI/CD',
     ],
     subtitle: 'SELECT CASE STUDIES',
     projects: [
@@ -129,9 +145,9 @@ export const realPortfolioData: PortfolioData = {
         category: 'ENTERPRISE CRM PLATFORM',
         title: 'Real Estate CRM',
         description:
-          'Comprehensive real estate management CRM built for agency workflows, lead distribution, property inventories, and dynamic client communications.',
-        tags: ['Laravel', 'MySQL', 'React', 'REST API'],
-        link: '#',
+          'Comprehensive CRM platform for real estate operations, automated lead pipelines, and client communications.',
+        tags: ['Laravel', 'MySQL', 'React', 'REST API', 'Linux'],
+        link: 'https://github.com/mahendra-builds/portfolio',
         image:
           'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=900&q=80',
         liveBadge: 'ENTERPRISE SYSTEM • CASE STUDY • ',
@@ -142,9 +158,9 @@ export const realPortfolioData: PortfolioData = {
         category: 'EMPLOYMENT & RECRUITMENT',
         title: 'Job:Hub and Portal',
         description:
-          'High-throughput hiring and talent marketplace connecting companies with skilled professionals, featuring algorithmic filtering and applicant workflows.',
-        tags: ['Drupal', 'PHP', 'OAuth2', 'Tailwind'],
-        link: '#',
+          'High-throughput talent platform connecting employers with professionals, featuring role filtering and candidate management.',
+        tags: ['Drupal', 'PHP', 'OAuth2', 'Tailwind', 'Nginx'],
+        link: 'https://github.com/mahendra-builds',
         image:
           'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?auto=format&fit=crop&w=900&q=80',
         liveBadge: 'TALENT PLATFORM • LIVE PORTAL • ',
@@ -155,9 +171,9 @@ export const realPortfolioData: PortfolioData = {
         category: 'PRODUCTIVITY & OPERATIONS',
         title: 'Task Management System',
         description:
-          'Collaborative task orchestration application engineered for high-velocity software squads with real-time status boards, time tracking, and metrics.',
+          'Collaborative task orchestration system with real-time status tracking, sprints, and Dockerized deployment.',
         tags: ['React', 'Laravel', 'Docker', 'GitLab CI'],
-        link: '#',
+        link: 'https://github.com/mahendra-builds',
         image:
           'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80',
         liveBadge: 'PRODUCTIVITY SUITE • DEMO • ',
@@ -169,13 +185,19 @@ export const realPortfolioData: PortfolioData = {
     titleHighlight: 'something ',
     titleEnd: 'exceptional.',
     subtitle:
-      'Discussing enterprise web applications, Drupal/Laravel consulting, or high-performance engineering. Feel free to connect.',
+      'Available for enterprise web engineering, Drupal/Laravel consulting, or Linux server deployment.',
     channels: [
       {
         label: 'Email me',
-        value: 'mahendra.rajput@example.com',
-        href: 'mailto:mahendra.rajput@example.com',
+        value: 'ma02@gmail.com',
+        href: 'mailto:ma02@gmail.com',
         type: 'email',
+      },
+      {
+        label: 'GitHub',
+        value: 'mahendra-builds',
+        href: 'https://github.com/mahendra-builds',
+        type: 'link',
       },
       {
         label: 'Connect',
@@ -184,8 +206,8 @@ export const realPortfolioData: PortfolioData = {
         type: 'link',
       },
       {
-        label: 'Location',
-        value: 'India',
+        label: 'Based in',
+        value: 'Indore, India',
         type: 'location',
       },
     ],

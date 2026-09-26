@@ -162,8 +162,8 @@ export const dummyPortfolioData: PortfolioData = {
     channels: [
       {
         label: 'Email me',
-        value: 'codefusion825@gmail.com',
-        href: 'mailto:codefusion825@gmail.com',
+        value: 'ma02@gmail.com',
+        href: 'mailto:ma02@gmail.com',
         type: 'email',
       },
       {

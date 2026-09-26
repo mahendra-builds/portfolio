@@ -11,6 +11,7 @@ import { AboutSection } from '@/components/sections/AboutSection';
 import { ExpertiseSection } from '@/components/sections/ExpertiseSection';
 import { WorkSection } from '@/components/sections/WorkSection';
 import { ContactSection } from '@/components/sections/ContactSection';
+import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 
 export default function Home() {
   const [loadingComplete, setLoadingComplete] = useState(false);
@@ -47,6 +48,9 @@ export default function Home() {
           <ContactSection />
         </main>
       </SmoothScroll>
+
+      {/* Floating Bottom Left WhatsApp Button */}
+      <WhatsAppButton />
     </CursorProvider>
   );
 }
