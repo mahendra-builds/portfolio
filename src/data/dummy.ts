@@ -1,0 +1,184 @@
+import { PortfolioData } from '@/types';
+import { realPortfolioData } from './real';
+
+/**
+ * Phase 18 Toggle:
+ * true  => Mahendra Rajput's Real Portfolio Data (Owner, Experience, Real Estate CRM, Job:Hub, Task Management, etc.)
+ * false => Original Reference Video Dummy Data
+ */
+export const USE_REAL_CONTENT = true;
+
+export const dummyPortfolioData: PortfolioData = {
+  meta: {
+    title: 'Waqas — Creative Developer & Motion Designer',
+    description:
+      'A modern, motion-heavy personal portfolio website showcasing creative development, UI/UX, and motion design.',
+    author: 'Waqas',
+  },
+  navigation: [
+    { label: 'WORK', href: '#work' },
+    { label: 'ABOUT', href: '#about' },
+    { label: 'JOURNAL', href: '#journal' },
+    { label: 'EXPERTISE', href: '#expertise' },
+    { label: 'CONTACT', href: '#contact' },
+  ],
+  hero: {
+    brand: 'waqas',
+    yearText: '©2026 waqas',
+    titlePrimary: 'CREATIVE',
+    titleSecondary: 'DEVELOPER',
+    disciplines: ['VISUALS', 'CODE', 'EXPERIENCE'],
+    scrollPrompt: 'SCROLL TO EXPLORE',
+    rotatingBadgeText: "LET'S WORK TOGETHER • LET'S WORK TOGETHER • ",
+    locationText: 'BASED IN PAKISTAN',
+  },
+  about: {
+    sectionNumber: '02',
+    sectionSubtitle: 'THE PERSON BEHIND THE WORK',
+    sectionTitle: 'ABOUT ME',
+    tagline: 'WHO AM I ?',
+    headline: {
+      plain1: 'I BUILD ',
+      highlight1: 'DIGITAL WORLDS',
+      plain2: ' WHERE ',
+      highlight2: 'DESIGN',
+      plain3: ' MEETS CODE.',
+    },
+    bioParagraphs: [
+      "I'm Waqas — a creative frontend developer who enjoys turning ideas, interfaces and motion into experiences people remember.",
+      "I care about the details most people don't notice: the rhythm of typography, the timing of an interaction, the way a transition feels and the tiny moments that make a digital product feel alive.",
+    ],
+    stats: [
+      { label: 'BASED', value: 'PAKISTAN' },
+      { label: 'FOCUS', value: 'WEB / MOTION' },
+      { label: 'BUILDING WEBSITES', value: '1+ YEAR' },
+      { label: 'MINDSET', value: 'ALWAYS LEARNING' },
+      { label: 'PROJECTS DONE', value: '10+' },
+      { label: 'EDUCATION', value: 'INTERMEDIATE' },
+    ],
+    portraitImage:
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
+  },
+  expertise: {
+    sectionNumber: '03',
+    sectionTitle: 'MY EXPERTISE',
+    lead: 'I design and build digital experiences where design, code and motion work as one.',
+    description:
+      'From expressive interfaces to smooth interactions, I combine frontend engineering with visual design to create digital experiences that feel alive.',
+    items: [
+      {
+        id: '01',
+        category: 'DEVELOPMENT',
+        title: 'Creative Development',
+        desc: 'Building fast, responsive and scalable interfaces with modern frontend technologies.',
+        tags: ['HTML', 'CSS', 'JAVASCRIPT', 'UI / MOTION'],
+        image:
+          'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80',
+      },
+      {
+        id: '02',
+        category: 'ANIMATION',
+        title: 'Motion & Interaction',
+        desc: 'Turning static interfaces into expressive experiences through meaningful motion and micro-interactions.',
+        tags: ['GSAP', 'SCROLLTRIGGER', 'LENIS', '3D / UI & UX'],
+        image:
+          'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
+      },
+      {
+        id: '03',
+        category: 'DESIGN',
+        title: 'UI / UX Design',
+        desc: 'Creating clean, system-driven design systems with strong hierarchy, usability, and a distinct visual personality.',
+        tags: ['DESIGN', 'UX', 'PROTOTYPING', 'DESIGN SYSTEMS'],
+        image:
+          'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
+      },
+      {
+        id: '04',
+        category: 'FULL STACK',
+        title: 'Modern Web Apps',
+        desc: 'Developing interactive applications with component-based architecture and dynamic data.',
+        tags: ['REACT', 'NEXT.JS', 'TYPESCRIPT', 'TAILWIND'],
+        image:
+          'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
+      },
+    ],
+    techStack: ['HTML', 'CSS', 'JavaScript', 'React JS', 'Lenis', 'GSAP', 'Firebase'],
+  },
+  work: {
+    sectionNumber: '04',
+    headerTag: 'SCROLL TO EXPLORE MY',
+    giantWord: 'WORK',
+    marqueeItems: ['UI/UX', 'INTERACTIVE WEB', 'CREATIVE DEVELOPMENT', 'MOTION DESIGN'],
+    subtitle: 'MY WORK',
+    projects: [
+      {
+        id: '01',
+        number: '01',
+        category: "GRAPHIC DESIGNER'S PORTFOLIO WEBSITE",
+        title: 'Creative Portfolio',
+        description:
+          'A modern visual identity and digital experience designed for a contemporary creative designer.',
+        tags: ['HTML', 'Tailwind', 'JavaScript', 'GSAP'],
+        link: 'https://portfolio-gd-1.netlify.app',
+        image:
+          'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=900&q=80',
+        liveBadge: 'VIEW MASTERPIECE • LIVE DEMO • ',
+      },
+      {
+        id: '02',
+        number: '02',
+        category: 'AGENCY & BRANDING',
+        title: 'Studio Minimal',
+        description:
+          'Interactive agency portfolio showcasing high-end visual production, directional typography, and fluid micro-interactions.',
+        tags: ['Next.js', 'TypeScript', 'GSAP', 'Lenis'],
+        link: '#',
+        image:
+          'https://images.unsplash.com/photo-1542744094-3a31f272c490?auto=format&fit=crop&w=900&q=80',
+        liveBadge: 'EXPLORE CASE STUDY • LIVE DEMO • ',
+      },
+      {
+        id: '03',
+        number: '03',
+        category: 'ECOMMERCE & FASHION',
+        title: 'GAZU Creative Clothing',
+        description:
+          'A modern digital shopping experience designed for contemporary brands, bringing products, style, and seamless commerce together.',
+        tags: ['React', 'Tailwind', 'GSAP', 'Lenis'],
+        link: 'https://project-gazu.netlify.app',
+        image:
+          'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80',
+        liveBadge: 'VIEW COLLECTION • LIVE DEMO • ',
+      },
+    ],
+  },
+  contact: {
+    titleStart: "Let's create ",
+    titleHighlight: 'something ',
+    titleEnd: 'meaningful.',
+    subtitle:
+      "Have a project in mind, a question, or simply want to talk about an idea? I'd love to hear from you.",
+    channels: [
+      {
+        label: 'Email me',
+        value: 'ma02@gmail.com',
+        href: 'mailto:ma02@gmail.com',
+        type: 'email',
+      },
+      {
+        label: 'Connect',
+        value: 'LinkedIn',
+        href: 'https://linkedin.com',
+        type: 'link',
+      },
+      {
+        label: 'Based in',
+        value: 'Pakistan',
+        type: 'location',
+      },
+    ],
+  },
+};
+
+export const portfolioData: PortfolioData = USE_REAL_CONTENT ? realPortfolioData : dummyPortfolioData;

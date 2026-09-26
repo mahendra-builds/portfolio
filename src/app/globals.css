@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --canvas-light: #F3EEE5;
+    --canvas-dark: #090909;
+    --surface-dark: #111111;
+    --surface-card: #161616;
+    --brand-gold: #D4AF37;
+    --brand-accent: #C5A880;
+  }
+
+  html {
+    font-family: var(--font-sans), sans-serif;
+    background-color: var(--canvas-light);
+    color: #111111;
+    overflow-x: hidden;
+    scroll-behavior: auto; /* Managed by Lenis */
+  }
+
+  body {
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom Cursor Defaults */
+@media (pointer: fine) {
+  body {
+    cursor: default;
+  }
+}
+
+/* Smooth Scrolling Support for Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Custom Text and Display Utilities */
+@layer utilities {
+  .text-huge {
+    font-size: clamp(3.2rem, 9.5vw, 8.5rem);
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+
+  .text-display-sub {
+    font-size: clamp(1.75rem, 4.5vw, 4.2rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+
+  .backdrop-blur-glass {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  /* Liquid ripple wave distortion filter transition */
+  .liquid-hover {
+    transition: filter 0.4s ease-out;
+  }
+  .liquid-hover:hover {
+    filter: url(#liquid-filter);
+  }
+}
