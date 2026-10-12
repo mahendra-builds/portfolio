@@ -31,7 +31,7 @@ export const ContactSection: React.FC = () => {
   const [statusMessage, setStatusMessage] = useState('');
 
   const emailChannel = contact.channels.find((c) => c.type === 'email');
-  const emailAddress = emailChannel?.value || 'ma02@gmail.com';
+  const emailAddress = emailChannel?.value || 'ma02raj@gmail.com';
   const locationChannel = contact.channels.find((c) => c.type === 'location');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -43,33 +43,46 @@ export const ContactSection: React.FC = () => {
     setStatus('submitting');
     setStatusMessage('Dispatching message to ' + emailAddress + '...');
 
+    const accessKey =
+      process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY ||
+      'e6bd668e-185a-44ef-912f-33ea91c86d2c';
+
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: formData.name,
+          email: formData.email,
+          replyto: formData.email,
+          message: formData.message,
+          from_name: `${formData.name} via Portfolio`,
+          subject: `New Portfolio Inquiry from ${formData.name}`,
+        }),
       });
 
-      if (!res.ok) {
-        throw new Error('API dispatch error');
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data?.success) {
+        throw new Error(data?.message || 'Message delivery failed. Please try again.');
       }
 
       setStatus('success');
       setStatusMessage(`Thank you, ${formData.name}! Your message was successfully sent to ${emailAddress}.`);
       setFormData({ name: '', email: '', message: '' });
       setTimeout(() => setStatus('idle'), 7000);
-    } catch {
-      // Direct client fallback to mailto so the user's message is NEVER lost
-      window.location.href = `mailto:${emailAddress}?subject=${encodeURIComponent(
-        `Portfolio Inquiry from ${formData.name}`
-      )}&body=${encodeURIComponent(
-        `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
-      )}`;
+    } catch (err: unknown) {
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : 'Failed to dispatch message. Please try again or reach out directly.';
 
-      setStatus('success');
-      setStatusMessage(`Your email client was opened to send your inquiry directly to ${emailAddress}.`);
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setStatus('idle'), 7000);
+      setStatus('error');
+      setStatusMessage(errorMsg);
     }
   };
 
