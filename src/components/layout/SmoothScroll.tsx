@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import { initGSAP, ScrollTrigger, gsap } from '@/animations/scrollTriggers';
+import { registerLenis } from '@/lib/lenis';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface SmoothScrollProps {
   children: React.ReactNode;
@@ -10,9 +12,17 @@ interface SmoothScrollProps {
 
 export const SmoothScroll: React.FC<SmoothScrollProps> = ({ children }) => {
   const lenisRef = useRef<Lenis | null>(null);
+  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     initGSAP();
+
+    if (reducedMotion) {
+      document.documentElement.classList.add('motion-reduced');
+      return;
+    }
+
+    document.documentElement.classList.remove('motion-reduced');
 
     const lenis = new Lenis({
       duration: 1.2,
@@ -24,11 +34,10 @@ export const SmoothScroll: React.FC<SmoothScrollProps> = ({ children }) => {
     });
 
     lenisRef.current = lenis;
+    registerLenis(lenis);
 
-    // Update ScrollTrigger on every Lenis scroll
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Bind GSAP ticker to Lenis
     const tickerUpdate = (time: number) => {
       lenis.raf(time * 1000);
     };
@@ -40,8 +49,9 @@ export const SmoothScroll: React.FC<SmoothScrollProps> = ({ children }) => {
       gsap.ticker.remove(tickerUpdate);
       lenis.destroy();
       lenisRef.current = null;
+      registerLenis(null);
     };
-  }, []);
+  }, [reducedMotion]);
 
   return <div className="smooth-scroll-wrapper">{children}</div>;
 };

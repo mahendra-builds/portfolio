@@ -17,7 +17,8 @@ export const RotatingBadge: React.FC<RotatingBadgeProps> = ({
   dark = false,
 }) => {
   const radius = 40;
-  const pathId = `circle-path-${size}-${Math.random().toString(36).substring(2, 7)}`;
+  const reactId = React.useId();
+  const pathId = `circle-path-${size}-${reactId.replace(/[^a-zA-Z0-9_-]/g, '')}`;
 
   return (
     <div
@@ -27,7 +28,7 @@ export const RotatingBadge: React.FC<RotatingBadgeProps> = ({
       {/* Rotating Circular Text SVG */}
       <svg
         viewBox="0 0 100 100"
-        className="w-full h-full animate-spin-slow origin-center"
+        className="w-full h-full animate-spin-slow motion-reduce:animate-none origin-center"
       >
         <path
           id={pathId}

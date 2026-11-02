@@ -18,10 +18,49 @@ export interface ProjectItem {
   category: string;
   title: string;
   description: string;
+  shortLine: string;
   tags: string[];
   link: string;
-  image: string;
+  image?: string;
+  imageLabel?: string;
   liveBadge: string;
+  mock: {
+    url: string;
+    accent: string;
+    kind: 'crm' | 'jobs' | 'tasks';
+  };
+}
+
+export interface ClientItem {
+  id: string;
+  name: string;
+  fullName: string;
+  url: string;
+  tag: string;
+  sector: string;
+  location: string;
+  work: string;
+  kind: 'client' | 'studio';
+}
+
+export interface ReviewItem {
+  id: string;
+  quote: string;
+  org: string;
+  url: string;
+  sector: string;
+  linkLabel: string;
+}
+
+export interface CounterItem {
+  label: string;
+  value: string;
+  suffix?: string;
+}
+
+export interface CtaLink {
+  label: string;
+  href: string;
 }
 
 export interface ContactInfo {
@@ -36,6 +75,10 @@ export interface PortfolioData {
     title: string;
     description: string;
     author: string;
+    aboutLine: string;
+    location: string;
+    locationUrl: string;
+    sameAs: string[];
   };
   navigation: NavLink[];
   hero: {
@@ -47,9 +90,17 @@ export interface PortfolioData {
     scrollPrompt: string;
     rotatingBadgeText: string;
     locationText: string;
+    taglinePrefix: string;
+    taglineSuffix: string;
+    rotatingWords: string[];
+    intro: string;
+    primaryCta: CtaLink;
+    secondaryCta: CtaLink;
+  };
+  marquee: {
+    words: string[];
   };
   about: {
-    sectionNumber: string;
     sectionSubtitle: string;
     sectionTitle: string;
     tagline: string;
@@ -61,16 +112,15 @@ export interface PortfolioData {
       plain3: string;
     };
     bioParagraphs: string[];
+    counters: CounterItem[];
     stats: {
       label: string;
       value: string;
     }[];
-    clients?: {
-      name: string;
-      url: string;
-      tag: string;
-    }[];
+    clients: ClientItem[];
+    studio: ClientItem;
     portraitImage: string;
+    showPortrait: boolean;
   };
   expertise: {
     sectionNumber: string;
@@ -88,11 +138,25 @@ export interface PortfolioData {
     subtitle: string;
     projects: ProjectItem[];
   };
+  reviews: {
+    sectionTitle: string;
+    sectionSubtitle: string;
+    note: string;
+    items: ReviewItem[];
+  };
   contact: {
     titleStart: string;
     titleHighlight: string;
     titleEnd: string;
     subtitle: string;
     channels: ContactInfo[];
+  };
+  footer: {
+    copyright: string;
+    links: {
+      label: string;
+      href: string;
+      external: boolean;
+    }[];
   };
 }

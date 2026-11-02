@@ -4,12 +4,13 @@
 
 @layer base {
   :root {
-    --canvas-light: #F3EEE5;
+    --canvas-light: #f3eee5;
     --canvas-dark: #090909;
     --surface-dark: #111111;
     --surface-card: #161616;
-    --brand-gold: #D4AF37;
-    --brand-accent: #C5A880;
+    --brand-gold: #d4af37;
+    --brand-gold-deep: #7a5f1a;
+    --brand-accent: #c5a880;
   }
 
   html {
@@ -26,6 +27,19 @@
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  /* Visible keyboard focus for every interactive element */
+  :focus-visible {
+    outline: 2px solid var(--brand-gold);
+    outline-offset: 2px;
   }
 }
 
@@ -56,6 +70,39 @@ html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Respect the user's motion preference across the whole site */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* Custom Text and Display Utilities */

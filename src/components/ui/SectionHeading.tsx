@@ -10,34 +10,24 @@ interface SectionHeadingProps {
   dark?: boolean;
   align?: 'left' | 'center';
   className?: string;
+  id?: string;
 }
 
 export const SectionHeading: React.FC<SectionHeadingProps> = ({
-  number,
-  tagline,
   title,
   highlight,
   dark = false,
   align = 'left',
   className = '',
+  id,
 }) => {
   return (
     <div
       className={`space-y-3 ${align === 'center' ? 'text-center mx-auto' : 'text-left'} ${className}`}
     >
-      {(number || tagline) && (
-        <div
-          className={`flex items-center gap-3 text-xs font-mono tracking-widest uppercase ${
-            align === 'center' ? 'justify-center' : ''
-          } ${dark ? 'text-neutral-500' : 'text-neutral-500'}`}
-        >
-          {number && <span className="font-semibold">{number}</span>}
-          {number && tagline && <span className="w-8 h-[1px] bg-neutral-600 inline-block" />}
-          {tagline && <span>{tagline}</span>}
-        </div>
-      )}
       <h2
-        className={`font-display text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase ${
+        id={id}
+        className={`font-display text-4xl sm:text-5xl md:text-6xl tracking-tight uppercase font-semibold ${
           dark ? 'text-white' : 'text-brand-black'
         }`}
       >
