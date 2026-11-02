@@ -1,35 +1,73 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 interface PreloaderProps {
   onComplete: () => void;
 }
 
+const FAILSAFE_MS = 5000;
+
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   const [count, setCount] = useState(0);
   const [phase, setPhase] = useState<'counter' | 'hello' | 'exit'>('counter');
   const containerRef = useRef<HTMLDivElement>(null);
-  const helloRef = useRef<HTMLHeadingElement>(null);
+  const helloRef = useRef<HTMLParagraphElement>(null);
   const pastaRef = useRef<SVGPathElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
+
+  const finish = useCallback(() => {
+    onCompleteRef.current();
+  }, []);
 
   useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const schedule = (fn: () => void, delay: number) => {
+      const id = setTimeout(fn, delay);
+      timers.push(id);
+      return id;
+    };
+
+    // Hard failsafe: the overlay must never stay on screen and block the page.
+    const failsafe = schedule(() => {
+      setPhase('exit');
+      finish();
+    }, FAILSAFE_MS);
+
+    if (reducedMotion) {
+      setCount(100);
+      setPhase('hello');
+      schedule(() => {
+        setPhase('exit');
+        finish();
+      }, 400);
+
+      return () => {
+        clearTimeout(failsafe);
+        timers.forEach(clearTimeout);
+      };
+    }
+
     const counterObj = { value: 0 };
 
-    // Animate percentage from 0 to 100
     const counterTl = gsap.to(counterObj, {
       value: 100,
       duration: 1.6,
-      ease: 'power2.inOut',
+      ease: 'power1.inOut',
       onUpdate: () => {
         setCount(Math.floor(counterObj.value));
       },
       onComplete: () => {
-        // Transition to "hello" phase
         setPhase('hello');
 
-        setTimeout(() => {
+        schedule(() => {
           if (helloRef.current) {
             gsap.fromTo(
               helloRef.current,
@@ -41,8 +79,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                 duration: 0.7,
                 ease: 'power3.out',
                 onComplete: () => {
-                  // Exit animation: curtain slides up
-                  setTimeout(() => {
+                  schedule(() => {
                     setPhase('exit');
                     if (containerRef.current) {
                       gsap.to(containerRef.current, {
@@ -50,42 +87,51 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                         duration: 1.1,
                         ease: 'power4.inOut',
                         onComplete: () => {
-                          onComplete();
+                          finish();
                         },
                       });
+                    } else {
+                      finish();
                     }
                   }, 600);
                 },
               }
             );
+          } else {
+            // No ref to animate — exit immediately rather than trapping the overlay.
+            setPhase('exit');
+            finish();
           }
         }, 100);
       },
     });
 
-    // Animate the pasta curve stroke
-    if (pastaRef.current) {
-      gsap.fromTo(
-        pastaRef.current,
-        { strokeDashoffset: 160 },
-        {
-          strokeDashoffset: 0,
-          duration: 1.6,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut',
-        }
-      );
-    }
+    const pastaTween = pastaRef.current
+      ? gsap.fromTo(
+          pastaRef.current,
+          { strokeDashoffset: 160 },
+          {
+            strokeDashoffset: 0,
+            duration: 1.6,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power1.inOut',
+          }
+        )
+      : null;
 
     return () => {
+      clearTimeout(failsafe);
+      timers.forEach(clearTimeout);
       counterTl.kill();
+      pastaTween?.kill();
     };
-  }, [onComplete]);
+  }, [reducedMotion, finish]);
 
   return (
     <div
       ref={containerRef}
+      aria-hidden="true"
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0e0e0e] text-white select-none will-change-transform"
     >
       {phase === 'counter' && (
@@ -100,7 +146,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             height="80"
             viewBox="0 0 100 100"
             fill="none"
-            className="animate-spin-slow"
+            className="animate-spin-slow motion-reduce:animate-none"
           >
             <path
               ref={pastaRef}
@@ -115,12 +161,12 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       )}
 
       {phase === 'hello' && (
-        <h1
+        <p
           ref={helloRef}
           className="font-script text-7xl sm:text-8xl md:text-9xl text-[#D8C7A5] tracking-wide"
         >
           hello
-        </h1>
+        </p>
       )}
     </div>
   );

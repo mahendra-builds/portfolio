@@ -1,180 +1,197 @@
-# Mahendra Rajput — Creative Developer & Linux Server Engineer
+# Mahendra Rajput — Portfolio
 
-A modern, reference-driven, motion-heavy personal portfolio website engineered with **Next.js 14 App Router**, **TypeScript**, **Tailwind CSS**, **GSAP**, and **Lenis Smooth Scroll**.
+Personal portfolio for a full stack developer and Linux server engineer.
+Live at **[mahiweb.in](https://mahiweb.in)**.
+
+Built with **Next.js 14 (App Router)**, **TypeScript**, **Tailwind CSS**, **GSAP**, **Lenis** smooth scroll, and **Vercel Analytics**.
 
 ![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)
 ![GSAP](https://img.shields.io/badge/GSAP-3.15-88CE02?style=for-the-badge&logo=greensock)
-![Lenis](https://img.shields.io/badge/Lenis-Smooth_Scroll-orange?style=for-the-badge)
+![Vercel](https://img.shields.io/badge/Vercel-Analytics-black?style=for-the-badge&logo=vercel)
 
 ---
 
-## 🌟 Visual Systems & Feature Highlights
+## What's inside
 
-### 1. Motion & Physics Engine
-- **Lenis Virtual Scroll**: Frictionless smooth scrolling synchronized directly with `gsap.ticker` to eliminate layout thrashing and maintain a consistent 60 FPS.
-- **Custom Dual-Element Magnetic Cursor**:
-  - Trailing circle with smooth 0.18 lerp physics.
-  - Automatic theme color inversion using `mix-blend-mode: difference` over light linen and dark obsidian surfaces.
-  - Contextual states: expands on interactive elements, displays a floating circular badge (`VISIT ↗`) over project cards, and disables safely on touch devices.
-- **SVG Liquid Wave Distortion Filter**: Real-time `<feTurbulence>` and `<feDisplacementMap>` distortion triggered dynamically on cursor movement over the giant Hero headline.
-- **Magnetic Buttons**: Spring physics attraction on badges and call-to-action buttons.
+- **Preloader** — 0→100% counter, animated macaroni curve, cursive "hello", curtain wipe.
+- **Hero** — giant `FULL STACK / DEVELOPER` headline with an SVG liquid-wave distortion on hover, a rotating highlighted word ("I build live **websites** people use every day"), and CTA buttons.
+- **Skills marquee** — slow scrolling tech ticker under the hero.
+- **About** — a live PHP code panel (your workbench), short bio, three count-up counters (years / projects / clients), metadata grid, and clickable client cards.
+- **Clients** — VTPC (Vaivari Technical Aids Centre, Latvia), UCDC (University of California Washington Center, Washington DC) and DB United (Prague), each linking to the live site.
+- **Skills & Expertise** — service accordion with hover image previews and floating tech badges.
+- **Work** — three project rows with hover slide, tech tags and live links.
+- **Client Work** — carousel of the work delivered per client, with arrows, dots, 6s auto-advance and pause on hover.
+- **Contact** — large headline, direct channel cards and a working contact form with success/error states.
+- **Footer** — copyright, GitHub, LinkedIn, CV and back-to-top.
+- **Floating WhatsApp button** — round green button, bottom-right, opens a prefilled chat.
 
-### 2. Full Section Suite
-- **Preloader Experience**: Numerical percentage counter (0% → 100%), animated SVG macaroni graphic with stroke-dashoffset motion, cursive `"hello"` reveal, and curtain exit wipe.
-- **Adaptive Header Navigation**:
-  - Transparent with dark typography when over the light linen Hero section.
-  - Automatically transitions to a sleek dark frosted glass header (`bg-[#090909]/85 backdrop-blur-md border-b border-white/10`) with high-contrast white tabs when scrolling over dark sections.
-  - Full-screen animated mobile menu drawer.
-- **Hero Section**: Linen cream canvas (`#F3EEE5`), giant compressed typography (`CREATIVE DEVELOPER`), disciplines row, scroll indicator, and rotating circular text stamp.
-- **About Me Section**: Dark curtain overlay transition (`rounded-t-[4rem]`), studio-lit editorial portrait, narrative bio, structured metadata grid, and verified enterprise clients:
-  - **[VTPC](https://www.vtpc.lv/)** (`vtpc.lv`)
-  - **[UCDC](https://www.ucdc.edu/)** (`ucdc.edu`)
-  - **[DB United](https://dbunited.co/)** (`dbunited.co`)
-- **Skills & Server Infrastructure**:
-  - Full stack engineering combined with deep **Linux Server Administration** (Ubuntu/Debian, SSH hardening, firewalls, Nginx reverse proxies, Docker containerization, DDEV local orchestration, MySQL tuning, and automated GitLab CI/CD pipelines).
-  - Interactive service accordion with floating thumbnail image previews and animated floating tech badges.
-- **Featured Projects Showcase**:
-  - Dripping liquid `"WORK"` typography with pulsing droplet elements and continuous marquee ticker.
-  - Stacked sticky project cards with live links:
-    - **Real Estate CRM** (Enterprise CRM Platform — Laravel, MySQL, React, REST API)
-    - **Job:Hub and Portal** (Employment & Talent Marketplace — Drupal, PHP, OAuth2, Nginx)
-    - **Task Management System** (Productivity Suite — React, Laravel, Docker, GitLab CI)
-- **Contact & Direct Channels**:
-  - Editorial headline, direct contact cards (Email, GitHub, LinkedIn, Location).
-  - Glassmorphism dark contact form submitting to `ma02@gmail.com` via backend API (`/api/contact`) with mailto fallback protection.
-- **Floating WhatsApp Button**:
-  - Positioned at the bottom-left corner with magnetic spring hover and direct chat connection to **+91 9754137138**.
+### Accessibility (WCAG 2.2 AA)
 
----
+- Single `<h1>`, clean `h1 → h2 → h3 → h4` heading order, and labelled landmarks.
+- Skip-to-content link as the first tab stop.
+- Every image has alt text, every input has a `<label>`, every link and button has an accessible name.
+- All body text meets a 4.5:1 contrast ratio (gold on cream uses a dedicated darker gold).
+- Visible keyboard focus rings on every interactive element.
+- Full `prefers-reduced-motion` support — Lenis, GSAP, the marquee, the preloader and magnetic buttons all stand down.
+- Fully responsive down to 390px, with the nav collapsing to a drawer below 1024px.
 
-## 🏗️ Project Architecture
+### SEO
 
-```
-portfolio/
-├── public/
-│   └── images/
-│       ├── mahendra-editorial.jpg     # Processed portrait with dark edge vignette
-│       └── mahendra-portrait.jpg      # High-res cropped portrait
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── contact/
-│   │   │       └── route.ts           # Contact submission API (dispatches to ma02@gmail.com)
-│   │   ├── favicon.ico
-│   │   ├── globals.css                # Fluid typography clamps, Lenis resets, utility classes
-│   │   ├── layout.tsx                 # Root layout with Anton, Plus Jakarta Sans, Caveat, JetBrains Mono
-│   │   └── page.tsx                   # Main page assembling all sections and providers
-│   ├── animations/
-│   │   └── scrollTriggers.ts          # Safe SSR GSAP & ScrollTrigger initialization
-│   ├── components/
-│   │   ├── layout/
-│   │   │   ├── CustomCursor.tsx       # Dual-element magnetic trailing cursor
-│   │   │   └── SmoothScroll.tsx       # Lenis smooth scroll provider synced to GSAP ticker
-│   │   ├── navigation/
-│   │   │   └── Navbar.tsx             # Adaptive scroll-aware header & mobile menu drawer
-│   │   ├── sections/
-│   │   │   ├── Preloader.tsx          # 0-100% counter + macaroni curve + cursive 'hello'
-│   │   │   ├── HeroSection.tsx        # Compressed display typography + liquid wave SVG filter
-│   │   │   ├── AboutSection.tsx       # Portrait, bio, stats, and clickable client badges
-│   │   │   ├── ExpertiseSection.tsx   # Service accordion, server knowledge, hover previews
-│   │   │   ├── WorkSection.tsx        # Dripping 'WORK' typography + stacked sticky cards
-│   │   │   └── ContactSection.tsx     # Channel cards, glass contact form, and footer
-│   │   └── ui/
-│   │       ├── Button.tsx             # Pill button primitive
-│   │       ├── Divider.tsx            # Hairline divider
-│   │       ├── ImageWrapper.tsx       # Aspect ratio image container with hover zoom
-│   │       ├── Label.tsx              # Monospace badge with dot indicator
-│   │       ├── Magnetic.tsx           # Magnetic spring physics wrapper
-│   │       ├── RotatingBadge.tsx      # Circular rotating SVG stamp
-│   │       ├── SectionHeading.tsx     # Section index and headline component
-│   │       ├── TextReveal.tsx         # ScrollTrigger word-by-word reveal utility
-│   │       └── WhatsAppButton.tsx     # Floating bottom-left WhatsApp button
-│   ├── context/
-│   │   └── CursorContext.tsx          # Global cursor state provider
-│   ├── data/
-│   │   ├── dummy.ts                   # Reference placeholder data & active toggle
-│   │   └── real.ts                    # Mahendra Rajput's portfolio & client data
-│   └── types/
-│       └── index.ts                   # TypeScript interfaces
-├── .eslintrc.json
-├── .gitignore
-├── .prettierrc
-├── next.config.mjs
-├── package.json
-├── tailwind.config.ts
-└── tsconfig.json
-```
+- JSON-LD `Person` + `WebSite` + `ProfilePage` schema, so searching **"Mahendra Rajput"** surfaces the name, role, skills and site.
+- Generated Open Graph / Twitter card image and browser-tab icon — "Mahendra Rajput — Full Stack Developer".
+- `sitemap.xml` and `robots.txt` routes, canonical URL, Open Graph profile card, and keyword-aligned headings.
+- Semantic first paragraph on every page section, so the content is readable by search crawlers and screen readers alike.
+
+### Motion & polish
+
+- Lenis smooth scroll synced to the GSAP ticker.
+- Custom magnetic cursor with theme inversion and contextual states.
+- Full `prefers-reduced-motion` support (Lenis, GSAP, marquee, preloader and magnetic buttons all stand down).
+- Visible keyboard focus rings and alt text throughout.
+- Fully responsive down to 390px.
 
 ---
 
-## ⚙️ Getting Started
+## Getting started
 
-### Prerequisites
-- **Node.js**: `v18.19.0` or higher
-- **npm**: `9.0.0` or higher
+### Requirements
 
-### Installation
-Clone the repository and install dependencies:
+- **Node.js** 18.18 or higher (Node 20+ recommended)
+- **npm** 9 or higher
+
+### Install & run
 
 ```bash
-git clone https://github.com/mahendra-builds/portfolio.git
-cd portfolio
 npm install
-```
-
-### Running Locally
-Start the development server:
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
-### Production Build
-Compile and validate production static and dynamic pages:
+### Production build
 
 ```bash
 npm run build
-npm run start
-```
-
-### Code Quality & Formatting
-Run ESLint check:
-
-```bash
-npm run lint
-```
-
-Format code using Prettier:
-
-```bash
-npm run format
+npm start
 ```
 
 ---
 
-## 🔄 Content Management (Data Layer)
+## Scripts
 
-All content is decoupled from components and managed in the data layer:
-
-- **`src/data/real.ts`**: Contains Mahendra Rajput's verified details, experience, server skills, projects, and client links.
-- **`src/data/dummy.ts`**: Contains the reference video dummy data.
-- **Active Data Toggle**:
-  In `src/data/dummy.ts`:
-  ```typescript
-  export const USE_REAL_CONTENT = true; // Set to false to preview original dummy data
-  ```
+| Script                  | What it does                                                       |
+| ----------------------- | ------------------------------------------------------------------ |
+| `npm run dev`           | Start the dev server                                               |
+| `npm run build`         | Production build                                                   |
+| `npm start`             | Serve the production build                                         |
+| `npm run lint`          | ESLint (`next lint`)                                               |
+| `npm run lint:fix`      | ESLint with auto-fix                                               |
+| `npm run typecheck`     | `tsc --noEmit`                                                     |
+| `npm run format`        | Prettier write                                                     |
+| `npm run format:check`  | Prettier check                                                     |
+| `npm run analyze`       | Build with the bundle analyzer (reports in `.next/analyze/*.html`) |
+| `npm run check`         | typecheck + lint + format check                                    |
+| `npm run vercel:dev`    | Local Vercel dev environment                                       |
+| `npm run vercel:deploy` | Deploy to Vercel production                                        |
 
 ---
 
-## 📬 Contact & Connect
+## Environment variables
 
-- **Engineer**: Mahendra Rajput
-- **Location**: Indore, Madhya Pradesh, India (Open to Remote Worldwide)
-- **Email**: [ma02@gmail.com](mailto:ma02@gmail.com)
-- **GitHub**: [@mahendra-builds](https://github.com/mahendra-builds)
-- **WhatsApp**: [+91 9754137138](https://wa.me/919754137138)
-- **LinkedIn**: [Mahendra Rajput](https://linkedin.com)
+Copy `.env.example` to `.env.local` and fill it in.
+
+| Variable                        | Required | Purpose                                                      |
+| ------------------------------- | -------- | ------------------------------------------------------------ |
+| `RESEND_API_KEY`                | yes      | Primary server-side email delivery (100 emails/day free)     |
+| `WEB3FORMS_ACCESS_KEY`          | optional | Secondary server-side fallback (needs a paid plan)           |
+| `RECIPIENT_EMAIL`               | yes      | Inbox that receives contact form submissions                 |
+| `CONTACT_FROM`                  | optional | Verified sender for Resend                                   |
+| `NEXT_PUBLIC_SENTRY_DSN`        | optional | Sentry error monitoring                                      |
+| `SENTRY_AUTH_TOKEN`             | optional | Sentry source map uploads                                    |
+| `SENTRY_ORG` / `SENTRY_PROJECT` | optional | Sentry project metadata                                      |
+| `NEXT_PUBLIC_SITE_URL`          | optional | Canonical URL for OG tags (defaults to `https://mahiweb.in`) |
+
+### How the contact form delivers mail
+
+The browser posts **only** to `/api/contact`. That route validates the submission, applies a
+honeypot, an origin check and a per-IP rate limit, then delivers server-side:
+
+1. **Resend** — the primary path. Works on the free tier, so a free `RESEND_API_KEY` is all you need.
+2. **Web3Forms** — secondary fallback. Web3Forms blocks server-side calls on the free plan
+   (`403 — This method is not allowed`), so this path only works on a Pro plan with the server IP
+   safelisted.
+
+If every provider fails, the visitor gets a visible error and a one-click mailto link — a message
+is never silently lost.
+
+> No delivery credential is ever sent to the browser. There must be **no** `NEXT_PUBLIC_` prefixed
+> copy of either key; `grep -r "WEB3FORMS" .next/static` should return nothing.
+
+---
+
+## Deploying to Vercel
+
+1. Import the repo at [vercel.com/new](https://vercel.com/new).
+2. Add the environment variables above under **Settings → Environment Variables**.
+3. Enable **Analytics** and **Speed Insights** for the project in the Vercel dashboard.
+4. Attach `mahiweb.in` under **Settings → Domains**.
+
+`vercel.json` already sets the framework, build commands, security headers and cache rules.
+
+### Continuous deployment
+
+Two GitHub Actions workflows are included:
+
+- `.github/workflows/ci.yml` — typecheck, lint, format check and build on every push and PR.
+- `.github/workflows/deploy.yml` — Vercel preview on PRs and production on `main`. It no-ops until
+  you add the `VERCEL_TOKEN`, `VERCEL_ORG_ID` and `VERCEL_PROJECT_ID` repository secrets.
+
+### Git hooks
+
+`husky` + `lint-staged` run Prettier and ESLint on staged files before every commit, and
+`commitlint` enforces conventional commit messages (`feat:`, `fix:`, `chore:`, …).
+
+---
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── api/contact/route.ts   # contact API (Resend → Web3Forms fallback)
+│   ├── globals.css             # theme tokens, keyframes, focus styles
+│   ├── layout.tsx              # metadata, OG/Twitter cards, Analytics
+│   ├── page.tsx                # composes every section
+│   └── global-error.tsx        # Sentry error boundary
+├── components/
+│   ├── layout/                 # custom cursor, Lenis wrapper
+│   ├── navigation/Navbar.tsx   # scroll-aware header + mobile drawer
+│   ├── sections/               # hero, marquee, about, expertise, work,
+│   │                           # reviews, contact, footer, preloader
+│   └── ui/                     # button, badge, magnetic, count-up, WhatsApp
+├── data/
+│   ├── real.ts                 # live content
+│   └── dummy.ts                # reference content + USE_REAL_CONTENT toggle
+├── hooks/useReducedMotion.ts
+└── types/index.ts
+```
+
+---
+
+## Connect
+
+- **Email** — [ma02raj@gmail.com](mailto:ma02raj@gmail.com)
+- **GitHub** — [@mahendra-builds](https://github.com/mahendra-builds)
+- **WhatsApp** — [+91 9754137138](https://wa.me/919754137138)
+- **LinkedIn** — _add your profile URL in `src/data/real.ts`_
+- **Studio** — [drupal.codernaline.com](https://drupal.codernaline.com)
+
+> Still to fill in: your **LinkedIn URL**, and a **professional photo** — drop it at
+> `public/images/mahendra-editorial.jpg` and flip `about.showPortrait` to `true` in
+> `src/data/real.ts` to swap the monogram badge for your picture.
+
+---
+
+© 2026 Mahendra Rajput

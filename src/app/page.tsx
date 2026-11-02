@@ -7,10 +7,13 @@ import { SmoothScroll } from '@/components/layout/SmoothScroll';
 import { Preloader } from '@/components/sections/Preloader';
 import { Navbar } from '@/components/navigation/Navbar';
 import { HeroSection } from '@/components/sections/HeroSection';
+import { SkillsMarquee } from '@/components/sections/SkillsMarquee';
 import { AboutSection } from '@/components/sections/AboutSection';
 import { ExpertiseSection } from '@/components/sections/ExpertiseSection';
 import { WorkSection } from '@/components/sections/WorkSection';
+import { ReviewsSection } from '@/components/sections/ReviewsSection';
 import { ContactSection } from '@/components/sections/ContactSection';
+import { Footer } from '@/components/sections/Footer';
 import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 
 export default function Home() {
@@ -19,21 +22,22 @@ export default function Home() {
   return (
     <CursorProvider>
       {/* Preloader Experience */}
-      {!loadingComplete && (
-        <Preloader onComplete={() => setLoadingComplete(true)} />
-      )}
+      {!loadingComplete && <Preloader onComplete={() => setLoadingComplete(true)} />}
 
       {/* Global Smooth Magnetic Custom Cursor */}
       <CustomCursor />
 
       {/* Lenis Smooth Scroll Container */}
       <SmoothScroll>
-        <main className="relative min-h-screen w-full overflow-x-hidden">
+        <main id="main" className="relative min-h-screen w-full overflow-x-hidden">
           {/* Header Navigation */}
           <Navbar />
 
           {/* Section 01: Hero Section */}
           <HeroSection />
+
+          {/* Skills Marquee */}
+          <SkillsMarquee />
 
           {/* Section 02: About Me Section */}
           <AboutSection />
@@ -44,12 +48,18 @@ export default function Home() {
           {/* Section 04: Work / Projects Showcase */}
           <WorkSection />
 
-          {/* Section 05: Contact & Footer */}
+          {/* Section 05: Client Work */}
+          <ReviewsSection />
+
+          {/* Section 06: Contact */}
           <ContactSection />
+
+          {/* Footer */}
+          <Footer />
         </main>
       </SmoothScroll>
 
-      {/* Floating Bottom Left WhatsApp Button */}
+      {/* Floating Bottom Right WhatsApp Button */}
       <WhatsAppButton />
     </CursorProvider>
   );

@@ -3,13 +3,26 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonBaseProps {
   children: React.ReactNode;
   variant?: 'light' | 'dark' | 'glass';
   showArrow?: boolean;
-  href?: string;
   className?: string;
 }
+
+type LinkButtonProps = ButtonBaseProps &
+  Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, 'className' | 'children'> & {
+    href: string;
+  };
+
+type NativeButtonProps = ButtonBaseProps &
+  Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'children'> & {
+    href?: undefined;
+  };
+
+type ButtonProps = LinkButtonProps | NativeButtonProps;
+
+const isExternalHref = (href: string) => /^https?:\/\//i.test(href);
 
 export const Button: React.FC<ButtonProps> = ({
   children,
@@ -34,26 +47,42 @@ export const Button: React.FC<ButtonProps> = ({
         {children}
       </span>
       {showArrow && (
-        <ArrowUpRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        <ArrowUpRight
+          aria-hidden="true"
+          className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        />
       )}
     </>
   );
 
-  if (href) {
+  if (href !== undefined) {
+    const external = isExternalHref(href);
+    const anchorProps = props as React.AnchorHTMLAttributes<HTMLAnchorElement>;
+
     return (
       <a
+        {...anchorProps}
         href={href}
         className={`${baseStyles} ${variants[variant]} ${className}`}
+        {...(external
+          ? {
+              target: anchorProps.target ?? '_blank',
+              rel: anchorProps.rel ?? 'noopener noreferrer',
+            }
+          : {})}
       >
         {content}
       </a>
     );
   }
 
+  const buttonProps = props as React.ButtonHTMLAttributes<HTMLButtonElement>;
+
   return (
     <button
+      type={buttonProps.type ?? 'button'}
+      {...buttonProps}
       className={`${baseStyles} ${variants[variant]} ${className}`}
-      {...props}
     >
       {content}
     </button>

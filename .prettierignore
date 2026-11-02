@@ -1,0 +1,13 @@
+node_modules
+.next
+analyze
+out
+build
+dist
+coverage
+public
+package-lock.json
+Planing
+Planing /CLAUDE.md
+*.pdf
+*.ico
