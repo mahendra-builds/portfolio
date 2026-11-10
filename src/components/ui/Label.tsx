@@ -22,9 +22,7 @@ export const Label: React.FC<LabelProps> = ({
       <span
         className={`${baseStyles} ${dark ? 'text-neutral-400' : 'text-neutral-600'} ${className}`}
       >
-        <span
-          className={`h-1.5 w-1.5 rounded-full ${dark ? 'bg-brand-gold' : 'bg-brand-black'}`}
-        />
+        <span className={`h-1.5 w-1.5 rounded-full ${dark ? 'bg-brand-gold' : 'bg-brand-black'}`} />
         {children}
       </span>
     );
@@ -46,7 +44,7 @@ export const Label: React.FC<LabelProps> = ({
 
   return (
     <span
-      className={`${baseStyles} ${dark ? 'text-neutral-400' : 'text-neutral-500'} ${className}`}
+      className={`${baseStyles} ${dark ? 'text-neutral-400' : 'text-neutral-600'} ${className}`}
     >
       {children}
     </span>

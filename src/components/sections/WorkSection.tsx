@@ -3,9 +3,8 @@
 import React from 'react';
 import { portfolioData } from '@/data/dummy';
 import { RotatingBadge } from '@/components/ui/RotatingBadge';
-import { Magnetic } from '@/components/ui/Magnetic';
 import { useCursor } from '@/context/CursorContext';
-import Image from 'next/image';
+import { ProjectMock } from '@/components/ui/ProjectMock';
 import { ArrowUpRight } from 'lucide-react';
 
 export const WorkSection: React.FC = () => {
@@ -15,7 +14,8 @@ export const WorkSection: React.FC = () => {
   return (
     <section
       id="work"
-      className="relative w-full bg-canvas-dark text-white py-16 sm:py-24 px-6 md:px-12 select-none border-t border-neutral-900"
+      aria-labelledby="work-heading"
+      className="relative w-full scroll-mt-24 bg-canvas-dark text-white py-16 sm:py-24 px-6 md:px-12 select-none border-t border-neutral-900"
     >
       <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16">
         {/* Work Intro Hero: Dripping 'WORK' Typography */}
@@ -25,7 +25,10 @@ export const WorkSection: React.FC = () => {
           </span>
 
           <div className="relative inline-block w-full">
-            <h2 className="font-display text-huge leading-[0.8] tracking-tighter uppercase font-bold text-[#E8DCC4]">
+            <h2
+              id="work-heading"
+              className="font-display text-huge leading-[0.85] tracking-tight uppercase font-semibold text-[#E8DCC4]"
+            >
               {work.giantWord}
             </h2>
 
@@ -40,9 +43,9 @@ export const WorkSection: React.FC = () => {
 
           {/* Marquee Ticker */}
           <div className="overflow-hidden py-3 border-y border-neutral-800/80 my-4">
-            <div className="flex whitespace-nowrap gap-8 animate-marquee text-xs font-mono tracking-widest text-neutral-400">
-              {work.marqueeItems.concat(work.marqueeItems).map((item, idx) => (
-                <span key={idx} className="flex items-center gap-6">
+            <div className="flex w-max animate-marquee motion-reduce:animate-none text-xs font-mono tracking-widest text-neutral-400">
+              {[...work.marqueeItems, ...work.marqueeItems].map((item, idx) => (
+                <span key={`${item}-${idx}`} className="flex items-center gap-8 pr-8">
                   <span>{item}</span>
                   <span className="text-brand-gold">✦</span>
                 </span>
@@ -55,83 +58,71 @@ export const WorkSection: React.FC = () => {
           </span>
         </div>
 
-        {/* Stacked Project Cards Showcase */}
-        <div className="space-y-8 sm:space-y-10">
+        {/* Project Rows */}
+        <div className="border-b border-neutral-800/80">
           {work.projects.map((project) => (
-            <div
+            <a
               key={project.id}
-              className="sticky top-24 group relative rounded-2xl overflow-hidden border border-neutral-800 bg-[#121212] p-6 sm:p-8 md:p-10 shadow-2xl transition-transform duration-500 hover:border-neutral-700"
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group relative grid grid-cols-1 md:grid-cols-[60px_1fr_auto] gap-3 md:gap-8 items-center py-7 sm:py-9 border-t border-neutral-800/80 transition-all duration-500 ease-out hover:pl-3 md:hover:pl-8 hover:bg-neutral-900/30 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-gold"
               onMouseEnter={() => setCursorVariant('project', 'VISIT ↗')}
               onMouseLeave={resetCursor}
             >
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-                {/* Left Side: Meta & Project Info */}
-                <div className="lg:col-span-6 space-y-4">
-                  <div className="flex items-center gap-3 text-xs font-mono text-neutral-500 uppercase">
-                    <span>{project.category}</span>
-                    <span>•</span>
-                    <span className="text-white font-bold">{project.number}</span>
-                  </div>
+              {/* Number */}
+              <span className="font-mono text-xs sm:text-sm text-neutral-400 uppercase">
+                {project.number}
+              </span>
 
-                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-display uppercase tracking-tight text-white group-hover:text-brand-accent transition-colors">
+              {/* Title, short line and tech tags */}
+              <div className="min-w-0">
+                <span className="block text-[10px] font-mono tracking-widest uppercase text-neutral-400 mb-1.5">
+                  {project.category}
+                </span>
+                <div className="flex items-center gap-4">
+                  <h3 className="font-display text-2xl sm:text-3xl md:text-4xl uppercase tracking-tight font-medium text-white transition-colors duration-300 group-hover:text-brand-gold">
                     {project.title}
                   </h3>
-
-                  <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed">
-                    {project.description}
-                  </p>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[11px] font-mono px-2.5 py-0.5 rounded-full border border-neutral-800 bg-neutral-900/80 text-neutral-400"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Live Link Button */}
-                  <div className="pt-2">
-                    <Magnetic strength={0.25}>
-                      <a
-                        href={project.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-neutral-700 text-xs font-mono uppercase tracking-wider text-white hover:bg-white hover:text-black transition-all duration-300"
-                      >
-                        <span>Launch Project</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </a>
-                    </Magnetic>
-                  </div>
-                </div>
-
-                {/* Right Side: Project Image Preview & Live Badge */}
-                <div className="lg:col-span-6 relative rounded-xl overflow-hidden aspect-[16/10] bg-neutral-950 border border-neutral-800">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-                  {/* Corner Rotating Demo Badge */}
-                  <div className="absolute bottom-3 right-3 z-10 hidden sm:block">
+                  <span className="hidden opacity-0 transition-opacity duration-500 group-hover:opacity-100 xl:block">
                     <RotatingBadge
                       text={project.liveBadge}
-                      size={80}
+                      size={64}
                       dark
                       className="bg-black/60 rounded-full backdrop-blur-md"
                     />
-                  </div>
+                  </span>
+                </div>
+                <p className="text-neutral-400 text-sm sm:text-base mt-1.5 max-w-2xl">
+                  {project.shortLine}
+                </p>
+                <div className="flex flex-wrap gap-2 pt-2.5">
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-[11px] font-mono px-2.5 py-0.5 rounded-full border border-neutral-800 bg-neutral-900/80 text-neutral-400"
+                    >
+                      {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
-            </div>
+
+              {/* Screenshot placeholder + launch action */}
+              <div className="flex items-center justify-between md:justify-end gap-4 md:gap-6 w-full md:w-auto">
+                <ProjectMock
+                  url={project.mock.url}
+                  accent={project.mock.accent}
+                  kind={project.mock.kind}
+                  className="hidden lg:block w-36 aspect-[16/10]"
+                />
+
+                <span className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-neutral-400 transition-colors duration-300 group-hover:text-brand-gold whitespace-nowrap">
+                  Launch Project
+                  <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </span>
+              </div>
+            </a>
           ))}
         </div>
       </div>

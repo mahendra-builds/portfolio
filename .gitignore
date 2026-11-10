@@ -6,6 +6,7 @@
 
 # Next.js Build Outputs
 /.next/
+/analyze/
 /out/
 /build
 /dist

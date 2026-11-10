@@ -1,11 +1,159 @@
 import { NextResponse } from 'next/server';
+import { SITE_URL } from '@/lib/site';
+
+const RESEND_ENDPOINT = 'https://api.resend.com/emails';
+const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 200;
+const MAX_MESSAGE_LENGTH = 5000;
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 5;
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const getResendKey = () => process.env.RESEND_API_KEY?.trim() || '';
+const getAccessKey = () => process.env.WEB3FORMS_ACCESS_KEY?.trim() || '';
+const getRecipient = () => process.env.RECIPIENT_EMAIL?.trim() || 'ma02raj@gmail.com';
+const getSender = () =>
+  process.env.CONTACT_FROM?.trim() || 'Mahendra Portfolio <onboarding@resend.dev>';
+
+const getClientIp = (req: Request): string => {
+  const forwarded = req.headers.get('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return req.headers.get('x-real-ip') || 'unknown';
+};
+
+const isAllowedOrigin = (req: Request): boolean => {
+  const origin = req.headers.get('origin');
+  if (!origin) return true;
+
+  let originHost: string;
+  try {
+    originHost = new URL(origin).host;
+  } catch {
+    return false;
+  }
+
+  // Same-origin requests (including local dev and preview deployments) are always allowed.
+  const requestHost = req.headers.get('host');
+  if (requestHost && originHost === requestHost) return true;
+
+  try {
+    return originHost === new URL(SITE_URL).host;
+  } catch {
+    return false;
+  }
+};
+
+const rateLimitHits = new Map<string, number[]>();
+
+const isRateLimited = (ip: string): boolean => {
+  const now = Date.now();
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+
+  const recent = (rateLimitHits.get(ip) || []).filter((timestamp) => timestamp > windowStart);
+
+  if (recent.length >= RATE_LIMIT_MAX_REQUESTS) {
+    rateLimitHits.set(ip, recent);
+    return true;
+  }
+
+  recent.push(now);
+  rateLimitHits.set(ip, recent);
+  return false;
+};
+
+const sendViaResend = async (
+  name: string,
+  email: string,
+  message: string
+): Promise<{ ok: boolean; reason?: string }> => {
+  const resendKey = getResendKey();
+  if (!resendKey) return { ok: false, reason: 'RESEND_API_KEY is not configured' };
+
+  const response = await fetch(RESEND_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${resendKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: getSender(),
+      to: [getRecipient()],
+      reply_to: email,
+      subject: `New Portfolio Inquiry from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+    }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok) {
+    return { ok: false, reason: data?.message || `HTTP ${response.status}` };
+  }
+
+  return { ok: true };
+};
+
+const sendViaWeb3Forms = async (
+  name: string,
+  email: string,
+  message: string
+): Promise<{ ok: boolean; reason?: string }> => {
+  const accessKey = getAccessKey();
+  if (!accessKey) return { ok: false, reason: 'WEB3FORMS_ACCESS_KEY is not configured' };
+
+  const response = await fetch(WEB3FORMS_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      access_key: accessKey,
+      name,
+      email,
+      replyto: email,
+      message,
+      subject: `New Portfolio Inquiry from ${name}`,
+    }),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok || !data?.success) {
+    return { ok: false, reason: data?.body?.message || data?.message || `HTTP ${response.status}` };
+  }
+
+  return { ok: true };
+};
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { name, email, message } = body;
+    if (!isAllowedOrigin(req)) {
+      return NextResponse.json({ error: 'Request origin is not allowed.' }, { status: 403 });
+    }
 
-    // Basic validation
+    if (isRateLimited(getClientIp(req))) {
+      return NextResponse.json(
+        { error: 'Too many messages sent. Please try again in a few minutes.' },
+        { status: 429 }
+      );
+    }
+
+    const body = await req.json();
+
+    // Honeypot: real visitors never fill this in, bots usually do.
+    if (typeof body.company === 'string' && body.company.trim().length > 0) {
+      return NextResponse.json({ success: true });
+    }
+
+    const name = typeof body.name === 'string' ? body.name.trim() : '';
+    const email = typeof body.email === 'string' ? body.email.trim() : '';
+    const message = typeof body.message === 'string' ? body.message.trim() : '';
+
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: 'All fields (name, email, message) are required.' },
@@ -13,74 +161,41 @@ export async function POST(req: Request) {
       );
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: 'Please enter a valid email address.' },
-        { status: 400 }
-      );
+    if (name.length > MAX_NAME_LENGTH) {
+      return NextResponse.json({ error: 'Name is too long.' }, { status: 400 });
     }
 
-    // Target recipient
-    const recipientEmail = process.env.RECIPIENT_EMAIL || 'ma02raj@gmail.com';
-
-    // Web3Forms API integration
-    const web3formsAccessKey = process.env.WEB3FORMS_ACCESS_KEY;
-
-    if (
-      !web3formsAccessKey ||
-      web3formsAccessKey.trim() === '' ||
-      web3formsAccessKey.includes('your_access_key') ||
-      web3formsAccessKey.includes('<key')
-    ) {
-      console.error('[Contact API] WEB3FORMS_ACCESS_KEY is not configured in .env.local');
-      return NextResponse.json(
-        {
-          error:
-            'Contact service is currently not configured. Please add your WEB3FORMS_ACCESS_KEY in .env.local or email directly.',
-        },
-        { status: 503 }
-      );
+    if (email.length > MAX_EMAIL_LENGTH || !EMAIL_REGEX.test(email)) {
+      return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
     }
 
-    const response = await fetch('https://api.web3forms.com/submit', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        access_key: web3formsAccessKey,
-        name,
-        email,
-        replyto: email,
-        message,
-        from_name: `${name} via Portfolio`,
-        subject: `New Portfolio Inquiry from ${name}`,
-      }),
-    });
-
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok || !data?.success) {
-      const errorMessage = data?.message || `Web3Forms responded with HTTP ${response.status}`;
-      console.error('[Contact Submission Delivery Error]:', errorMessage);
-      return NextResponse.json(
-        { error: `Message delivery failed: ${errorMessage}. Please try again or reach out directly.` },
-        { status: response.status >= 400 ? response.status : 502 }
-      );
+    if (message.length > MAX_MESSAGE_LENGTH) {
+      return NextResponse.json({ error: 'Message is too long.' }, { status: 400 });
     }
 
-    console.log(`[Contact Submission Success] Recipient: ${recipientEmail} | From: ${name} (${email})`);
+    const resend = await sendViaResend(name, email, message);
+    if (resend.ok) {
+      return NextResponse.json({ success: true });
+    }
 
-    return NextResponse.json({
-      success: true,
-      recipient: recipientEmail,
-      message: 'Your message has been dispatched successfully!',
-    });
+    const web3forms = await sendViaWeb3Forms(name, email, message);
+    if (web3forms.ok) {
+      return NextResponse.json({ success: true });
+    }
+
+    console.error(
+      '[Contact API] Delivery failed. Resend:',
+      resend.reason,
+      '| Web3Forms:',
+      web3forms.reason
+    );
+
+    return NextResponse.json(
+      { error: 'The message could not be delivered right now. Please email me directly.' },
+      { status: 502 }
+    );
   } catch (err: unknown) {
-    console.error('Contact form submission error:', err);
+    console.error('[Contact API] Submission error:', err);
     return NextResponse.json(
       { error: 'An unexpected server error occurred while sending your message. Please try again.' },
       { status: 500 }

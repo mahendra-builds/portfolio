@@ -13,7 +13,8 @@ export const ExpertiseSection: React.FC = () => {
   return (
     <section
       id="expertise"
-      className="relative w-full bg-canvas-dark text-white py-16 sm:py-24 px-6 md:px-12 select-none border-t border-neutral-900 overflow-hidden"
+      aria-labelledby="expertise-heading"
+      className="relative w-full scroll-mt-24 bg-canvas-dark text-white py-16 sm:py-24 px-6 md:px-12 select-none border-t border-neutral-900 overflow-hidden"
     >
       {/* Background Floating Animated Tech Badges */}
       <div className="absolute inset-0 pointer-events-none opacity-15 overflow-hidden">
@@ -34,14 +35,9 @@ export const ExpertiseSection: React.FC = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start relative z-10">
         {/* Left Column: Heading, Lead & Tech Pills */}
         <div className="lg:col-span-5 space-y-6 sticky top-24">
-          <SectionHeading
-            number={expertise.sectionNumber}
-            tagline="EXPERTISE & SERVERS"
-            title={expertise.sectionTitle}
-            dark
-          />
+          <SectionHeading id="expertise-heading" title={expertise.sectionTitle} dark />
 
-          <p className="text-lg sm:text-xl font-sans font-medium text-neutral-200 leading-snug">
+          <p className="text-lg sm:text-xl font-sans font-normal text-neutral-300 leading-snug">
             {expertise.lead}
           </p>
 
@@ -73,17 +69,15 @@ export const ExpertiseSection: React.FC = () => {
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1.5 max-w-lg">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-neutral-500">
-                      /{item.id}
-                    </span>
+                    <span className="text-xs font-mono text-neutral-400">/{item.id}</span>
                     <span className="text-[10px] font-mono tracking-widest uppercase px-2 py-0.5 rounded border border-neutral-800 text-neutral-400">
                       {item.category}
                     </span>
                   </div>
 
-                  <h4 className="text-xl sm:text-2xl font-display uppercase tracking-tight text-white group-hover:text-brand-accent transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-display uppercase tracking-tight font-medium text-white group-hover:text-brand-accent transition-colors">
                     {item.title}
-                  </h4>
+                  </h3>
 
                   <p className="text-xs sm:text-sm text-neutral-400 font-sans leading-relaxed pt-0.5">
                     {item.desc}
@@ -93,7 +87,7 @@ export const ExpertiseSection: React.FC = () => {
                     {item.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[10px] font-mono tracking-wider text-neutral-500"
+                        className="text-[10px] font-mono tracking-wider text-neutral-400"
                       >
                         #{tag}
                       </span>
