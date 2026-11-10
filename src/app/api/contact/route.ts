@@ -197,7 +197,7 @@ export async function POST(req: Request) {
   } catch (err: unknown) {
     console.error('[Contact API] Submission error:', err);
     return NextResponse.json(
-      { error: 'Failed to process message submission. Please try again.' },
+      { error: 'An unexpected server error occurred while sending your message. Please try again.' },
       { status: 500 }
     );
   }

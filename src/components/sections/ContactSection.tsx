@@ -88,8 +88,12 @@ export const ContactSection: React.FC = () => {
     setStatusMessage('Dispatching your message...');
     setMailtoHref(null);
 
+    const accessKey =
+      process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY ||
+      'e6bd668e-185a-44ef-912f-33ea91c86d2c';
+
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, message, company }),
