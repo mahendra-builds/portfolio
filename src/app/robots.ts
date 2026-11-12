@@ -1,14 +1,15 @@
 import type { MetadataRoute } from 'next';
-
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mahiweb.in';
+import { SITE_URL } from '@/lib/site';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
       allow: '/',
+      // The contact endpoint is a POST API, not a page — keep crawlers out.
+      disallow: '/api/',
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

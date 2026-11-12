@@ -32,7 +32,7 @@ export const realPortfolioData: PortfolioData = {
     taglineSuffix: 'people use every day.',
     rotatingWords: ['websites', 'dashboards', 'APIs', 'CMS platforms', 'Drupal sites', 'servers'],
     intro:
-      '2+ years building for clients like VTPC, UCDC and DB United — from the interface to the backend and the server it runs on.',
+      'Mahendra Rajput — full stack developer in Indore, India. I build Drupal, Laravel and React platforms for clients like VTPC, UCDC and DB United, and run the Linux servers behind them.',
     primaryCta: { label: 'View my work', href: '#work' },
     secondaryCta: { label: 'Download CV', href: '/mahendra-cv.pdf' },
   },
@@ -63,7 +63,7 @@ export const realPortfolioData: PortfolioData = {
       plain3: '.',
     },
     bioParagraphs: [
-      "I'm Mahendra, a full stack developer and Linux enthusiast. I build websites, dashboards, APIs and CMS platforms for international clients — and I keep things clean from code to server.",
+      "I'm Mahendra Rajput, a full stack developer and Linux server engineer based in Indore, India. I build websites, dashboards, APIs and CMS platforms for international clients — and I keep things clean from code to server.",
       'Working with Codernaline, I ship Drupal, Laravel and React work for organisations in Latvia, Washington DC and Prague, then run and maintain the Linux infrastructure underneath.',
     ],
     counters: [
@@ -301,6 +301,12 @@ export const realPortfolioData: PortfolioData = {
         value: 'ma02raj@gmail.com',
         href: 'mailto:ma02raj@gmail.com',
         type: 'email',
+      },
+      {
+        label: 'Call',
+        value: '+91 97541 37138',
+        href: 'tel:+919754137138',
+        type: 'phone',
       },
       {
         label: 'GitHub',

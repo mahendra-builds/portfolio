@@ -28,6 +28,9 @@ const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  // The mono face is only used below the fold (code panel, small labels), so
+  // it must not compete with the display/body fonts for critical bandwidth.
+  preload: false,
 });
 
 const siteUrl = SITE_URL;
@@ -71,7 +74,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    creator: '@mahendra-builds',
   },
   robots: {
     index: true,
@@ -101,12 +103,26 @@ const jsonLd = {
       jobTitle: 'Full Stack Developer and Linux Server Engineer',
       description:
         'Mahendra Rajput is a full stack developer and Linux server engineer based in Indore, India. He builds Drupal, Laravel and React platforms, and runs the Linux servers they live on.',
-      email: 'mailto:ma02raj@gmail.com',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Indore',
         addressRegion: 'Madhya Pradesh',
         addressCountry: 'IN',
+      },
+      telephone: '+91-97541-37138',
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: 'Full Stack Developer',
+        occupationLocation: {
+          '@type': 'City',
+          name: 'Indore',
+        },
+        skills:
+          'Drupal, Laravel, PHP, React, Next.js, TypeScript, MySQL, REST API, OAuth2, Docker, Linux, Nginx, DevOps, CI/CD',
+      },
+      areaServed: {
+        '@type': 'Text',
+        name: 'Worldwide',
       },
       knowsAbout: [
         'Drupal',
@@ -129,24 +145,25 @@ const jsonLd = {
         name: 'Codernaline',
         url: 'https://drupal.codernaline.com',
       },
-      knowsAboutOrganizations: [
-        {
-          '@type': 'Organization',
-          name: 'Vaivari Technical Aids Centre',
-          url: 'https://www.vtpc.lv/',
-        },
-        {
-          '@type': 'Organization',
-          name: 'University of California Washington Center',
-          url: 'https://www.ucdc.edu/',
-        },
-        {
-          '@type': 'Organization',
-          name: 'DB United Corp s.r.o.',
-          url: 'https://dbunited.co/',
-        },
-      ],
       sameAs: ['https://github.com/mahendra-builds', 'https://www.linkedin.com/in/mhndrtech'],
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#client-vtpc`,
+      name: 'Vaivari Technical Aids Centre',
+      url: 'https://www.vtpc.lv/',
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#client-ucdc`,
+      name: 'University of California Washington Center',
+      url: 'https://www.ucdc.edu/',
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}/#client-dbunited`,
+      name: 'DB United Corp s.r.o.',
+      url: 'https://dbunited.co/',
     },
     {
       '@type': 'WebSite',
@@ -165,6 +182,11 @@ const jsonLd = {
       isPartOf: { '@id': `${siteUrl}/#website` },
       about: { '@id': `${siteUrl}/#person` },
       inLanguage: 'en-US',
+      mentions: [
+        { '@id': `${siteUrl}/#client-vtpc` },
+        { '@id': `${siteUrl}/#client-ucdc` },
+        { '@id': `${siteUrl}/#client-dbunited` },
+      ],
     },
   ],
 };
@@ -177,7 +199,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${jakarta.variable} ${caveat.variable} ${jetbrains.variable} scroll-smooth`}
+      className={`${anton.variable} ${jakarta.variable} ${caveat.variable} ${jetbrains.variable} motion-safe:scroll-smooth`}
     >
       <body className="bg-canvas-light text-brand-black antialiased selection:bg-brand-black selection:text-white">
         <script

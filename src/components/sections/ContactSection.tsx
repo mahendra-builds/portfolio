@@ -2,12 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { portfolioData } from '@/data/dummy';
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, MapPin, Phone, Send, CheckCircle2, AlertCircle, Copy } from 'lucide-react';
 import { useCursor } from '@/context/CursorContext';
 
 interface ContactApiResponse {
   success?: boolean;
   error?: string;
+  code?: string;
 }
 
 const LinkedinIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
@@ -42,6 +43,12 @@ export const ContactSection: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
   const [mailtoHref, setMailtoHref] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [lastSubmission, setLastSubmission] = useState<{
+    name: string;
+    email: string;
+    message: string;
+  } | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submittingRef = useRef(false);
 
@@ -57,6 +64,7 @@ export const ContactSection: React.FC = () => {
   const emailChannel = contact.channels.find((c) => c.type === 'email');
   const emailAddress = emailChannel?.value || 'ma02raj@gmail.com';
   const locationChannel = contact.channels.find((c) => c.type === 'location');
+  const phoneChannel = contact.channels.find((c) => c.type === 'phone');
   const linkedinChannel = contact.channels.find((c) => c.value === 'LinkedIn');
   const githubChannel = contact.channels.find((c) => c.value === 'mahendra-builds');
 
@@ -68,6 +76,51 @@ export const ContactSection: React.FC = () => {
     `mailto:${emailAddress}?subject=${encodeURIComponent(
       `Portfolio Inquiry from ${name}`
     )}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+
+  const buildPlainText = (name: string, email: string, message: string) =>
+    `Portfolio Inquiry from ${name}\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`;
+
+  /**
+   * Last-resort fallback: on mobile, "Open email client" often opens a blank
+   * composer (or nothing at all). Copying the full message to the clipboard
+   * means the visitor never loses what they typed.
+   */
+  const handleCopy = async () => {
+    if (!lastSubmission) return;
+    const text = buildPlainText(lastSubmission.name, lastSubmission.email, lastSubmission.message);
+
+    // Legacy path for browsers (or contexts) where the async clipboard API is
+    // unavailable or blocked.
+    const copyWithExecCommand = () => {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'absolute';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(area);
+      if (!ok) throw new Error('execCommand copy failed');
+    };
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          // Rejected (no permission / no user activation) — use the legacy path.
+          copyWithExecCommand();
+        }
+      } else {
+        copyWithExecCommand();
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 4000);
+    } catch {
+      setStatusMessage('Could not copy automatically — please use the email button.');
+    }
+  };
 
   const scheduleStatusReset = () => {
     if (statusTimerRef.current) {
@@ -98,6 +151,9 @@ export const ContactSection: React.FC = () => {
       const data: ContactApiResponse = await res.json().catch(() => ({}));
 
       if (!res.ok || !data.success) {
+        if (data.code === 'email_not_configured') {
+          throw new Error('the form is not connected to an email service yet');
+        }
         throw new Error(data.error || 'Delivery failed.');
       }
 
@@ -112,6 +168,7 @@ export const ContactSection: React.FC = () => {
         `Could not send automatically (${reason}). Use the button below to email me directly.`
       );
       setMailtoHref(buildMailto(name, email, message));
+      setLastSubmission({ name, email, message });
     } finally {
       submittingRef.current = false;
     }
@@ -187,8 +244,26 @@ export const ContactSection: React.FC = () => {
                 <MapPin className="w-5 h-5" aria-hidden="true" />
               </a>
 
+              {/* Tap-to-call: the phone number is published here (and in the
+                  Person schema) for local search intent and NAP consistency. */}
+              <a
+                href={phoneChannel?.href || 'tel:+919754137138'}
+                aria-label={`Call Mahendra Rajput on ${phoneChannel?.value || '+91 97541 37138'}`}
+                className="group flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#121212] text-neutral-300 hover:border-brand-gold/60 hover:text-brand-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                onMouseEnter={() => setCursorVariant('hover')}
+                onMouseLeave={resetCursor}
+              >
+                <Phone className="w-5 h-5" aria-hidden="true" />
+              </a>
+
               <span className="ml-1 text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-                Indore, IN · Remote OK
+                Indore, IN · Remote OK ·{' '}
+                <a
+                  href={phoneChannel?.href || 'tel:+919754137138'}
+                  className="hover:text-brand-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                >
+                  +91 97541 37138
+                </a>
               </span>
             </div>
           </div>
@@ -299,13 +374,32 @@ export const ContactSection: React.FC = () => {
                     <span>{statusMessage}</span>
                   </div>
                   {mailtoHref && (
-                    <a
-                      href={mailtoHref}
-                      className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
-                    >
-                      <Mail className="w-3.5 h-3.5" aria-hidden="true" />
-                      Open email client
-                    </a>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <a
+                        href={mailtoHref}
+                        className="inline-flex items-center gap-2 rounded-full bg-white text-black px-4 py-2 font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                      >
+                        <Mail className="w-3.5 h-3.5" aria-hidden="true" />
+                        Open email client
+                      </a>
+
+                      {/* Clipboard fallback — mobile mailto clients often open
+                          a blank composer and lose the message. */}
+                      <button
+                        type="button"
+                        onClick={handleCopy}
+                        className="inline-flex items-center gap-2 rounded-full border border-rose-800 px-4 py-2 font-semibold uppercase tracking-wider text-rose-200 hover:border-rose-400 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                      >
+                        <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+                        {copied ? 'Copied' : 'Copy message'}
+                      </button>
+                    </div>
+                  )}
+
+                  {copied && (
+                    <span role="status" aria-live="polite">
+                      Message copied to your clipboard — paste it into any email app.
+                    </span>
                   )}
                 </div>
               )}

@@ -23,7 +23,7 @@ export const ProjectMock: React.FC<ProjectMockProps> = ({ url, accent, kind, cla
         <span className="h-1.5 w-1.5 rounded-full bg-neutral-700" />
         <span className="h-1.5 w-1.5 rounded-full bg-neutral-700" />
         <span className="h-1.5 w-1.5 rounded-full bg-neutral-700" />
-        <span className="ml-1 truncate rounded bg-neutral-900 px-1.5 py-0.5 font-mono text-[7px] text-neutral-500">
+        <span className="ml-1 truncate rounded bg-neutral-900 px-1.5 py-0.5 font-mono text-[7px] text-neutral-400">
           {url}
         </span>
       </div>

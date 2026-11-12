@@ -98,6 +98,31 @@ npm start
 
 ---
 
+## Measuring performance (read before auditing)
+
+> **Always audit the production build — never `npm run dev`.**
+>
+> ```bash
+> npm run build && npm start   # then audit http://localhost:3000
+> ```
+
+The dev server serves unminified, unbundled modules with React StrictMode
+double-invoking effects, hot-reload instrumentation and `Cache-Control:
+no-store`. Auditing it produces numbers that do not exist in production — a
+recent run scored **Performance 48 / LCP 7.1 s / TBT 2130 ms** on `next dev`,
+while the same code scored **99 / LCP 1.6 s / TBT 110 ms** as a production
+build. Audit `https://mahiweb.in` (or `npm start`) for numbers that count.
+
+Two more environment-only artefacts that show up in local audits:
+
+- `/_vercel/insights/script.js` and `/_vercel/speed-insights/script.js` return
+  **500 off Vercel** (they return 200 in production) and are logged as console
+  errors, which costs Best Practices points locally only.
+- Lighthouse reports "missing source maps" until the deploy workflow uploads
+  them to Sentry (see `.github/workflows/deploy.yml`).
+
+---
+
 ## Environment variables
 
 Copy `.env.example` to `.env.local` and fill it in.

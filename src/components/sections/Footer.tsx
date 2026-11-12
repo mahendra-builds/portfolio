@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
               key={link.label}
               href={link.href}
               {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              className="inline-flex items-center gap-1 font-mono text-xs tracking-wider uppercase text-neutral-400 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-gold"
+              className="inline-flex min-h-6 items-center gap-1 px-1.5 py-1.5 font-mono text-xs tracking-wider uppercase text-neutral-400 hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-gold"
               onMouseEnter={() => setCursorVariant('hover')}
               onMouseLeave={resetCursor}
             >

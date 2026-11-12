@@ -19,6 +19,24 @@ const getRecipient = () => process.env.RECIPIENT_EMAIL?.trim() || 'ma02raj@gmail
 const getSender = () =>
   process.env.CONTACT_FROM?.trim() || 'Mahendra Portfolio <onboarding@resend.dev>';
 
+let senderWarningLogged = false;
+
+/**
+ * `onboarding@resend.dev` (the fallback sender) can only deliver to the
+ * Resend account owner's own inbox — a very common cause of a 403 in
+ * production. Warn loudly so the misconfiguration is visible in the logs.
+ */
+const warnIfSenderNotConfigured = () => {
+  if (senderWarningLogged) return;
+  if (process.env.CONTACT_FROM?.trim()) return;
+  senderWarningLogged = true;
+  console.warn(
+    '[Contact API] CONTACT_FROM is not set — falling back to "onboarding@resend.dev". ' +
+      "Resend only allows that address to deliver to the account owner's own inbox; " +
+      'set CONTACT_FROM to a verified sender (e.g. "Mahendra Rajput <hello@mahiweb.in>").'
+  );
+};
+
 const getClientIp = (req: Request): string => {
   const forwarded = req.headers.get('x-forwarded-for');
   if (forwarded) return forwarded.split(',')[0].trim();
@@ -72,6 +90,8 @@ const sendViaResend = async (
 ): Promise<{ ok: boolean; reason?: string }> => {
   const resendKey = getResendKey();
   if (!resendKey) return { ok: false, reason: 'RESEND_API_KEY is not configured' };
+
+  warnIfSenderNotConfigured();
 
   const response = await fetch(RESEND_ENDPOINT, {
     method: 'POST',
@@ -129,6 +149,28 @@ const sendViaWeb3Forms = async (
 
   return { ok: true };
 };
+
+/**
+ * Health probe — reports whether email delivery is actually configured on this
+ * deployment. Booleans only, no secrets, never cached.
+ *
+ *   curl https://mahiweb.in/api/contact
+ *   → { "providers": { "resend": true, "web3forms": true }, ... }
+ */
+export async function GET() {
+  return NextResponse.json(
+    {
+      status: 'ok',
+      providers: {
+        resend: Boolean(getResendKey()),
+        web3forms: Boolean(getAccessKey()),
+      },
+      recipientConfigured: Boolean(process.env.RECIPIENT_EMAIL?.trim()),
+      senderConfigured: Boolean(process.env.CONTACT_FROM?.trim()),
+    },
+    { headers: { 'Cache-Control': 'no-store' } }
+  );
+}
 
 export async function POST(req: Request) {
   try {
@@ -190,8 +232,27 @@ export async function POST(req: Request) {
       web3forms.reason
     );
 
+    // Distinguish "the server was never configured" from "the provider
+    // rejected the message" — the first one is an infrastructure problem that
+    // needs a Vercel environment variable, the second is a transient failure.
+    const providerConfigured = Boolean(getResendKey() || getAccessKey());
+
+    if (!providerConfigured) {
+      return NextResponse.json(
+        {
+          error:
+            'Direct email delivery is not configured on the server yet. Please email me directly.',
+          code: 'email_not_configured',
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
-      { error: 'The message could not be delivered right now. Please email me directly.' },
+      {
+        error: 'The message could not be delivered right now. Please email me directly.',
+        code: 'delivery_failed',
+      },
       { status: 502 }
     );
   } catch (err: unknown) {

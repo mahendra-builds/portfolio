@@ -36,6 +36,13 @@
     text-wrap: balance;
   }
 
+  /* The giant display headings are single-line by design ("FULL STACK",
+     "WORK"). Balancing them costs extra layout passes for no visual
+     difference, so they opt out. */
+  .text-huge {
+    text-wrap: normal;
+  }
+
   /* Visible keyboard focus for every interactive element */
   :focus-visible {
     outline: 2px solid var(--brand-gold);
@@ -47,6 +54,16 @@
 @media (pointer: fine) {
   body {
     cursor: default;
+  }
+}
+
+/* On touch devices the custom cursor is inert (its JS bails out), but the
+   full-viewport mix-blend-difference layer was still mounted and blended over
+   the whole page every frame. Hide it entirely on coarse pointers — no visual
+   difference, one less compositing layer on mobile. */
+@media (pointer: coarse) {
+  .custom-cursor-layer {
+    display: none;
   }
 }
 
