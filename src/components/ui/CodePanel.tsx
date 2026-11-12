@@ -106,7 +106,14 @@ export const CodePanel: React.FC<CodePanelProps> = ({
         </span>
       </div>
 
-      <pre className="flex-1 overflow-x-auto px-4 py-5 font-mono text-[11px] leading-[1.85] sm:text-xs">
+      {/* Horizontally scrollable: a scrollable region must be reachable and
+          operable by keyboard (WCAG 2.1.1 / axe `scrollable-region-focusable`). */}
+      <pre
+        tabIndex={0}
+        role="region"
+        aria-label={`${filename} code sample, horizontally scrollable`}
+        className="flex-1 overflow-x-auto px-4 py-5 font-mono text-[11px] leading-[1.85] sm:text-xs focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-gold"
+      >
         <code>
           {CODE_LINES.map((line, index) => (
             <span key={index} className="block">

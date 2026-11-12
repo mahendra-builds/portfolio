@@ -85,7 +85,7 @@ export const ReviewsSection: React.FC = () => {
                   {active.org}
                 </a>
               </cite>
-              <span className="text-neutral-500" aria-hidden="true">
+              <span className="text-neutral-400" aria-hidden="true">
                 ·
               </span>
               <span className="text-neutral-400">{active.sector}</span>
@@ -135,7 +135,9 @@ export const ReviewsSection: React.FC = () => {
               </button>
             )}
 
-            <div role="group" aria-label="Choose client" className="flex items-center gap-2 ml-2">
+            {/* Dot hit areas are 24x24px minimum (WCAG 2.2 AA SC 2.5.8); the
+                visible bar stays 10px tall. */}
+            <div role="group" aria-label="Choose client" className="flex items-center ml-1">
               {reviews.items.map((item, index) => (
                 <button
                   key={item.id}
@@ -143,12 +145,17 @@ export const ReviewsSection: React.FC = () => {
                   aria-pressed={index === activeIndex}
                   aria-label={`Show work for ${item.org}`}
                   onClick={() => goTo(index)}
-                  className={`h-2.5 rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold ${
-                    index === activeIndex
-                      ? 'w-7 bg-brand-gold'
-                      : 'w-2.5 bg-neutral-800 hover:bg-neutral-600'
-                  }`}
-                />
+                  className="grid h-6 w-6 place-items-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                >
+                  <span
+                    aria-hidden="true"
+                    className={`block h-2.5 rounded-full transition-all duration-300 ${
+                      index === activeIndex
+                        ? 'w-6 bg-brand-gold'
+                        : 'w-2.5 bg-neutral-800 hover:bg-neutral-600'
+                    }`}
+                  />
+                </button>
               ))}
             </div>
           </div>
