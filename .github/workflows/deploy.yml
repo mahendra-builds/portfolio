@@ -63,6 +63,27 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
+      # Guard: without RESEND_API_KEY in the Production environment the contact
+      # form cannot deliver mail — it silently answers 503/502 to every
+      # visitor. Fail the deploy loudly instead of shipping a broken form.
+      - name: Verify email provider is configured for Production
+        run: |
+          echo "Checking Vercel environment variables for RESEND_API_KEY (Production)..."
+          ENV_LIST="$(npx vercel env ls --token="$VERCEL_TOKEN" 2>&1 || true)"
+          echo "$ENV_LIST" | grep -E "RESEND_API_KEY|WEB3FORMS_ACCESS_KEY" || true
+
+          if ! echo "$ENV_LIST" | grep "RESEND_API_KEY" | grep -q "Production"; then
+            echo "::error::RESEND_API_KEY is not set for the Production environment on Vercel."
+            echo "::error::Add it in Vercel → Project → Settings → Environment Variables (Production), then re-run this workflow."
+            exit 1
+          fi
+
+          echo "RESEND_API_KEY is present for Production."
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
       - name: Build with Vercel
         run: npx vercel build --token=${{ secrets.VERCEL_TOKEN }}
         env:
