@@ -6,6 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
+      // The contact endpoint is a POST API, not a page — keep crawlers out.
+      disallow: '/api/',
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,

@@ -2,12 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { portfolioData } from '@/data/dummy';
-import { Mail, MapPin, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, MapPin, Phone, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useCursor } from '@/context/CursorContext';
 
 interface ContactApiResponse {
   success?: boolean;
   error?: string;
+  code?: string;
 }
 
 const LinkedinIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
@@ -57,6 +58,7 @@ export const ContactSection: React.FC = () => {
   const emailChannel = contact.channels.find((c) => c.type === 'email');
   const emailAddress = emailChannel?.value || 'ma02raj@gmail.com';
   const locationChannel = contact.channels.find((c) => c.type === 'location');
+  const phoneChannel = contact.channels.find((c) => c.type === 'phone');
   const linkedinChannel = contact.channels.find((c) => c.value === 'LinkedIn');
   const githubChannel = contact.channels.find((c) => c.value === 'mahendra-builds');
 
@@ -187,8 +189,26 @@ export const ContactSection: React.FC = () => {
                 <MapPin className="w-5 h-5" aria-hidden="true" />
               </a>
 
+              {/* Tap-to-call: the phone number is published here (and in the
+                  Person schema) for local search intent and NAP consistency. */}
+              <a
+                href={phoneChannel?.href || 'tel:+919754137138'}
+                aria-label={`Call Mahendra Rajput on ${phoneChannel?.value || '+91 97541 37138'}`}
+                className="group flex h-12 w-12 items-center justify-center rounded-full border border-neutral-800 bg-[#121212] text-neutral-300 hover:border-brand-gold/60 hover:text-brand-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                onMouseEnter={() => setCursorVariant('hover')}
+                onMouseLeave={resetCursor}
+              >
+                <Phone className="w-5 h-5" aria-hidden="true" />
+              </a>
+
               <span className="ml-1 text-[11px] font-mono tracking-widest text-neutral-400 uppercase">
-                Indore, IN · Remote OK
+                Indore, IN · Remote OK ·{' '}
+                <a
+                  href={phoneChannel?.href || 'tel:+919754137138'}
+                  className="hover:text-brand-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                >
+                  +91 97541 37138
+                </a>
               </span>
             </div>
           </div>

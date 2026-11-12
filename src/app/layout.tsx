@@ -109,6 +109,21 @@ const jsonLd = {
         addressRegion: 'Madhya Pradesh',
         addressCountry: 'IN',
       },
+      telephone: '+91-97541-37138',
+      hasOccupation: {
+        '@type': 'Occupation',
+        name: 'Full Stack Developer',
+        occupationLocation: {
+          '@type': 'City',
+          name: 'Indore',
+        },
+        skills:
+          'Drupal, Laravel, PHP, React, Next.js, TypeScript, MySQL, REST API, OAuth2, Docker, Linux, Nginx, DevOps, CI/CD',
+      },
+      areaServed: {
+        '@type': 'Text',
+        name: 'Worldwide',
+      },
       knowsAbout: [
         'Drupal',
         'Laravel',

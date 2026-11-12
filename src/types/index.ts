@@ -67,7 +67,7 @@ export interface ContactInfo {
   label: string;
   value: string;
   href?: string;
-  type: 'email' | 'link' | 'location';
+  type: 'email' | 'phone' | 'link' | 'location';
 }
 
 export interface PortfolioData {
