@@ -283,3 +283,207 @@ axe-core result on the production build: **2 violations → 0**. Lighthouse a11y
 3. **Sentry source maps** need the `SENTRY_AUTH_TOKEN` / `SENTRY_ORG` / `SENTRY_PROJECT` repository secrets for the new CI step to run.
 4. **Real-user Core Web Vitals** (Vercel Speed Insights p75) can only be validated after the deploy; the Vercel CLI is not authenticated in this environment, so those numbers must come from you.
 5. Minor cosmetic note: the carousel dots now sit 14 px apart instead of 8 px (hit area 24 px each), and the footer links carry 6 px horizontal padding.
+
+---
+
+## 14. SEO Phase 1 — entity signals (implemented) + the off-site playbook
+
+### 14.1 Why this phase exists
+
+For the query **"Mahendra Rajput"** the entities Google can match are exactly two: your website and your LinkedIn profile. Everything below makes those two say the _same thing_ in the same words, and makes your site the strongest version of that entity.
+
+Diagnosis of the live page before this phase:
+
+| Signal                                                                          | State                                                                        | Impact                                       |
+| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------- |
+| First paragraph (= the LCP element and Google's primary "about this page" text) | _"2+ years building for clients like VTPC…"_ — **no name, no role, no city** | the single biggest relevance gap             |
+| About bio                                                                       | _"I'm **Mahendra**, a full stack developer…"_ — first name only              | weakens the entity match                     |
+| Phone                                                                           | only inside the WhatsApp float, no `tel:` link, no schema                    | weak local-intent signals                    |
+| Person schema                                                                   | `Person` + `ProfilePage` + `WebSite` ✅ but no occupation/skills/area served | incomplete entity profile                    |
+| Crawlable pages                                                                 | 1 (nav is `#hash` anchors)                                                   | no internal link graph, no long-tail surface |
+
+### 14.2 Changes implemented in this phase
+
+| #   | Change                                                                                                                                                                                                                                              | File                                                                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1   | Hero intro now carries **name + role + city + clients**: _"Mahendra Rajput — full stack developer in Indore, India. I build Drupal, Laravel and React platforms for clients like VTPC, UCDC and DB United, and run the Linux servers behind them."_ | `src/data/real.ts`                                                                     |
+| 2   | About bio now reads _"I'm **Mahendra Rajput**, a full stack developer and Linux server engineer based in **Indore, India**."_                                                                                                                       | `src/data/real.ts`                                                                     |
+| 3   | **Phone published**: visible `+91 97541 37138` next to the contact icons + a 48 px tap-to-call button (`tel:+919754137138`), driven by a new `phone` channel in the data model                                                                      | `src/data/real.ts`, `src/types/index.ts`, `src/components/sections/ContactSection.tsx` |
+| 4   | Person schema enriched with `telephone`, `hasOccupation` (Occupation + `skills` + `occupationLocation`), `areaServed: Worldwide` — all valid schema.org properties, nothing invented                                                                | `src/app/layout.tsx`                                                                   |
+| 5   | `robots.txt` now `Disallow: /api/` (the contact endpoint is a POST API, not a page)                                                                                                                                                                 | `src/app/robots.ts`                                                                    |
+
+The email deliberately stays **out** of the schema (per your earlier decision) while the phone is in — the phone is a business contact number that is already public via WhatsApp.
+
+### 14.3 Phase 0 — manual steps (cannot be automated from here)
+
+1. **Deploy** — push the branch and merge to `main` (Vercel auto-deploys `main` only), or `vercel link && npm run vercel:deploy`.
+2. **Search Console** — add the **Domain** property `mahiweb.in` (DNS TXT record), submit `https://mahiweb.in/sitemap.xml`, then URL-Inspection → Request indexing for `/`.
+3. **Rich Results Test** on `mahiweb.in` → confirm `Person`, `ProfilePage`, `WebSite`, `Organization` validate with no errors.
+4. **Bing Webmaster Tools** → import the site from GSC (seconds to set up, gives a second index).
+5. **Re-audit** the deployed URL with Lighthouse in a production build (never `next dev` — see §13.1).
+
+### 14.4 Off-site entity playbook (paste-ready)
+
+**LinkedIn headline**
+
+> Full Stack Developer | Drupal · Laravel · React · Next.js · Linux/DevOps | Indore, India
+
+**LinkedIn About (first paragraph)**
+
+> Mahendra Rajput is a full stack developer and Linux server engineer based in Indore, India. I build Drupal, Laravel and React platforms for international clients — from the interface to the server it runs on. Currently shipping work with Codernaline for organisations in Latvia, Washington DC and Prague.
+
+**LinkedIn settings** — Featured: _Mahendra Rajput — Portfolio (mahiweb.in)_; Website field: `https://mahiweb.in`; location: _Indore, Madhya Pradesh, India_; custom URL: `linkedin.com/in/mhndrtech`.
+
+**GitHub profile**
+
+- Bio: `Full stack developer in Indore, India — Drupal, Laravel, React, Next.js, Linux/DevOps.`
+- Website field: `https://mahiweb.in`
+- Profile README: one paragraph (same wording as above) + links to the portfolio, the CV, and 3 pinned repos.
+
+**Everywhere else (directories, freelance profiles, Stack Overflow, dev.to)**
+Use exactly this NAP string and nothing else:
+
+> Mahendra Rajput · Full Stack Developer · Indore, Madhya Pradesh, India · +91 97541 37138 · mahiweb.in
+
+**Do not do** (they read as spam and get penalised): buying links, PBNs, mass guest posting, keyword stuffing, fake reviews/clients, AI-spun blog volumes.
+
+### 14.5 Phase 2 preview — the route split (next)
+
+To compete for _discovery_ queries ("full stack developer indore", "drupal developer"), one page is not enough. Phase 2 adds crawlable routes **while keeping the homepage exactly as it is**:
+
+| Route          | Purpose                                                                  | Structured data          |
+| -------------- | ------------------------------------------------------------------------ | ------------------------ |
+| `/`            | profile hub (unchanged)                                                  | `ProfilePage` ✅         |
+| `/work`        | all projects                                                             | `CollectionPage`         |
+| `/work/[slug]` | 3 case studies (problem → stack → outcome)                               | `Article`/`CreativeWork` |
+| `/resume`      | HTML version of the CV (the PDF stays as a download — PDFs barely index) | `ProfilePage`            |
+| `/notes`       | technical writing (long-tail: "drupal developer india")                  | `Blog` + `BlogPosting`   |
+| `/contact`     | contact page                                                             | `ContactPage`            |
+
+Plus: `BreadcrumbList`, descriptive internal anchor text, `sitemap.xml` entries per route with real `lastmod`, and an RSS feed.
+
+---
+
+## 15. Contact form — root cause analysis and fix
+
+### 15.1 Symptom
+
+The contact form on `https://mahiweb.in` never delivered mail. Every submission returned:
+
+```
+HTTP 502  {"error":"The message could not be delivered right now. Please email me directly."}
+```
+
+### 15.2 How the root cause was proven (timing, not guesswork)
+
+| Request                                                       | Result  | Time       |
+| ------------------------------------------------------------- | ------- | ---------- |
+| `POST /api/contact` (valid payload)                           | **502** | 490 ms     |
+| `POST /api/contact` (rejected origin → no provider work)      | 403     | 406 ms     |
+| `POST https://api.resend.com/emails` (real call, invalid key) | 401     | **530 ms** |
+
+A real provider call costs ~530 ms on its own. The contact endpoint spent only **~84 ms more** than the path that does no provider work — far less than one round-trip. **Conclusion: no outbound request was ever made.**
+
+The mechanism in `src/app/api/contact/route.ts` explains it exactly:
+
+```ts
+const resendKey = getResendKey();            // process.env.RESEND_API_KEY
+if (!resendKey) return { ok: false, reason: 'RESEND_API_KEY is not configured' };   // ← no fetch
+...
+const accessKey = getAccessKey();            // process.env.WEB3FORMS_ACCESS_KEY
+if (!accessKey) return { ok: false, reason: 'WEB3FORMS_ACCESS_KEY is not configured' }; // ← no fetch
+```
+
+Both providers short-circuit on a missing key → the route falls through to a generic 502. **The Vercel Production environment has neither `RESEND_API_KEY` nor `WEB3FORMS_ACCESS_KEY` set.** (Locally, `.env.local` carries a Web3Forms key that answers HTTP 403 — consistent with the note in `.env.example` that Web3Forms server-side use needs a paid plan plus IP whitelisting; so Resend is the only viable provider.)
+
+### 15.3 Two traps that survive a naive "just add the key" fix
+
+1. **`onboarding@resend.dev` can only deliver to the account owner's own inbox.** With `CONTACT_FROM` unset, the code falls back to that sender — if `RECIPIENT_EMAIL` is not the Resend account's own address, Resend answers 403 _after_ a valid key is added.
+2. **`CONTACT_FROM` must be a verified sender.** Verify `mahiweb.in` in Resend and use `Mahendra Rajput <hello@mahiweb.in>`.
+
+### 15.4 Fixes implemented
+
+| #   | Fix                                                                                                                                                                                                                          | File                                         |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| 1   | **Distinct failure modes** — `503 { code: 'email_not_configured' }` (server misconfiguration) vs `502 { code: 'delivery_failed' }` (provider rejected it)                                                                    | `src/app/api/contact/route.ts`               |
+| 2   | **`GET /api/contact` health probe** → `{ status, providers: { resend, web3forms }, recipientConfigured, senderConfigured }` — booleans only, `no-store`                                                                      | `src/app/api/contact/route.ts`               |
+| 3   | **Warning log** when `CONTACT_FROM` is unset, naming the `onboarding@resend.dev` trap                                                                                                                                        | `src/app/api/contact/route.ts`               |
+| 4   | **Client**: understands `email_not_configured`; adds a **"Copy message"** button (clipboard + `aria-live` confirmation) next to "Open email client" — mobile mailto clients often open a blank composer and lose the message | `src/components/sections/ContactSection.tsx` |
+| 5   | **Deploy guard** — the workflow reads `vercel env ls` and **fails the deploy** if `RESEND_API_KEY` is missing for Production, so a broken contact form can never ship again                                                  | `.github/workflows/deploy.yml`               |
+| 6   | **`.env.example`** — required-ness spelled out, the `onboarding@resend.dev` warning, the production checklist, and the probe URL                                                                                             | `.env.example`                               |
+
+### 15.5 Verification performed (local production build)
+
+| Scenario                                                        | Result                                                                                                                            |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `GET /api/contact` with no keys                                 | `{"providers":{"resend":false,"web3forms":false},"recipientConfigured":true,"senderConfigured":false}` ✅                         |
+| `GET /api/contact` with Web3Forms key present                   | `{"providers":{"resend":false,"web3forms":true}, …}` ✅                                                                           |
+| `POST` with **no** provider configured                          | **503** `{"code":"email_not_configured"}` ✅                                                                                      |
+| `POST` with a provider configured but rejecting (Web3Forms 403) | **502** `{"code":"delivery_failed"}` ✅                                                                                           |
+| `POST` with a disallowed Origin                                 | **403**, unchanged ✅                                                                                                             |
+| Server log                                                      | `[Contact API] Delivery failed. Resend: RESEND_API_KEY is not configured \| Web3Forms: WEB3FORMS_ACCESS_KEY is not configured` ✅ |
+
+### 15.6 What you must do (only you can)
+
+1. Vercel → Project → Settings → Environment Variables → **Production** (and Preview):
+   - `RESEND_API_KEY` = `re_…` (resend.com → API Keys) — **required**
+   - `RECIPIENT_EMAIL` = `ma02raj@gmail.com`
+   - `CONTACT_FROM` = `Mahendra Rajput <hello@mahiweb.in>` (after verifying the domain in Resend)
+   - `WEB3FORMS_ACCESS_KEY` = optional best-effort fallback
+2. **Redeploy** — environment changes only apply to a new deployment.
+3. Confirm: `curl https://mahiweb.in/api/contact` → `{"providers":{"resend":true,…}}`, then submit the form and check the inbox.
+
+### 15.7 Known limitation (not fixed by design)
+
+The rate limiter is an in-memory `Map` inside the serverless function, so on Vercel it is **per instance** — a cold start resets it, and the "5 messages / 10 minutes" limit is therefore best-effort, not global. Fixing it properly needs a shared store (Vercel KV / Upstash), i.e. a new dependency and a paid/limited service, so it was deliberately left alone. The honeypot field and the 5,000-character cap still apply.
+
+---
+
+## 16. Resend webhook — delivery status tracking
+
+### 16.1 Why it was added
+
+Until now the site had **no webhook at all**: the contact route calls Resend directly and the visitor gets a success/failure answer, but nobody knows whether the mail was actually _delivered_, _bounced_ or _complained_. A Resend webhook closes that gap — the provider calls back with the real delivery outcome.
+
+### 16.2 Implementation
+
+`src/app/api/webhooks/resend/route.ts` (new route, **no new dependency**):
+
+| Concern                | How it is handled                                                                                                                                                              |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Signature verification | Svix/Resend signs `${svix_id}.${svix_timestamp}.${body}` with HMAC-SHA256; verified with Node's `crypto.createHmac` and compared with `crypto.timingSafeEqual` (constant time) |
+| Raw body               | `await req.text()` — re-serialising the parsed JSON would change the bytes and break the signature                                                                             |
+| Header shapes          | Both `v1,<base64>` and `t=<ts>,v1=<base64>` are parsed                                                                                                                         |
+| Replay protection      | Signatures whose timestamp is more than **300 s** away from now are refused (HTTP 403)                                                                                         |
+| Event handling         | `email.sent` / `email.delivered` → delivered · `email.bounced` (+ reason) → bounced · `email.complained` → complained                                                          |
+| Unknown event types    | Acknowledged with 200 so Resend does not retry them                                                                                                                            |
+| Observability          | Structured JSON log line per event (type, email id, recipient, reason) → visible in the Vercel logs                                                                            |
+| Status endpoint        | `GET /api/webhooks/resend` → `{ configured, recentEvents[] }` (booleans + the last 25 events, in-memory and per instance — the durable record is the log)                      |
+
+Response codes: `200` processed · `400` malformed body · `401` bad/missing signature · `403` stale timestamp · `503` secret not configured.
+
+### 16.3 Verification performed (forged requests against the production build)
+
+| Test                                      | Expected | Result                                                                                               |
+| ----------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| Valid signature (`v1,<sig>`)              | 200      | ✅ 200 `{"received":true,"type":"email.delivered"}`                                                  |
+| Valid signature (`t=,v1=` shape)          | 200      | ✅ 200                                                                                               |
+| Body tampered after signing               | 401      | ✅ 401 `{"error":"Invalid signature."}`                                                              |
+| Signed with a different secret            | 401      | ✅ 401                                                                                               |
+| Stale timestamp (replay attempt, 1 h old) | 403      | ✅ 403                                                                                               |
+| No `svix-signature` header                | 401      | ✅ 401                                                                                               |
+| Malformed JSON with a valid signature     | 400      | ✅ 400                                                                                               |
+| Unknown event type                        | 200      | ✅ 200                                                                                               |
+| `RESEND_WEBHOOK_SECRET` not set           | 503      | ✅ 503 + log `[Resend Webhook] RESEND_WEBHOOK_SECRET is not set — webhook events are being dropped.` |
+
+### 16.4 Clipboard-fallback hardening (found while testing)
+
+The "Copy message" fallback initially used `navigator.clipboard.writeText()` and only fell back to `document.execCommand('copy')` when the Clipboard API was **absent**. A headless test showed it also fails when the API **rejects** (no permission / no user activation). The handler now falls back to the legacy path on rejection too — verified end-to-end with a trusted click: the error state appears, both buttons render, and the clipboard contains the full message.
+
+### 16.5 Setup (you)
+
+1. Resend dashboard → **Webhooks** → add endpoint `https://mahiweb.in/api/webhooks/resend`, subscribe to `email.sent`, `email.delivered`, `email.bounced`, `email.complained`.
+2. Copy the signing secret → Vercel → Environment Variables → Production → `RESEND_WEBHOOK_SECRET`.
+3. Redeploy, then check `curl https://mahiweb.in/api/webhooks/resend` → `{ "configured": true }`.
+
+Until the secret is set, the endpoint answers 503 and logs that events are being dropped — it never accepts unverified payloads.
