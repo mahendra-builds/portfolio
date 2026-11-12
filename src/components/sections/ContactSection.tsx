@@ -89,19 +89,31 @@ export const ContactSection: React.FC = () => {
     if (!lastSubmission) return;
     const text = buildPlainText(lastSubmission.name, lastSubmission.email, lastSubmission.message);
 
+    // Legacy path for browsers (or contexts) where the async clipboard API is
+    // unavailable or blocked.
+    const copyWithExecCommand = () => {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'absolute';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(area);
+      if (!ok) throw new Error('execCommand copy failed');
+    };
+
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch {
+          // Rejected (no permission / no user activation) — use the legacy path.
+          copyWithExecCommand();
+        }
       } else {
-        const area = document.createElement('textarea');
-        area.value = text;
-        area.setAttribute('readonly', '');
-        area.style.position = 'absolute';
-        area.style.left = '-9999px';
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand('copy');
-        document.body.removeChild(area);
+        copyWithExecCommand();
       }
       setCopied(true);
       setTimeout(() => setCopied(false), 4000);
