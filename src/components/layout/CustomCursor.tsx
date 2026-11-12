@@ -142,7 +142,7 @@ export const CustomCursor: React.FC = () => {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-50 overflow-hidden mix-blend-difference"
+      className="custom-cursor-layer pointer-events-none fixed inset-0 z-50 overflow-hidden mix-blend-difference"
     >
       {/* Smooth Trailing Ring */}
       <div

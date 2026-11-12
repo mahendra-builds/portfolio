@@ -25,18 +25,29 @@ export const Magnetic: React.FC<MagneticProps> = ({ children, strength = 0.35 })
     const moveX = gsap.quickTo(el, 'x', { duration: 0.5, ease: 'power2.out' });
     const moveY = gsap.quickTo(el, 'y', { duration: 0.5, ease: 'power2.out' });
 
-    const onMouseMove = (e: MouseEvent) => {
+    // Cache the untransformed centre. The old version called
+    // getBoundingClientRect() on every mousemove (a forced reflow per frame).
+    // The centre only changes on scroll (the element moves under the pointer)
+    // or resize, so it is measured on pointer enter and re-measured on those
+    // events instead.
+    let centerX = 0;
+    let centerY = 0;
+    let measureTick = false;
+    const measureCenter = () => {
       const rect = el.getBoundingClientRect();
 
-      // getBoundingClientRect() reflects the GSAP-applied translation, so subtract it
-      // to recover the untransformed centre. Without this the offset compounds and
-      // the element converges fully onto the pointer regardless of `strength`.
+      // getBoundingClientRect() reflects the GSAP-applied translation, so
+      // subtract it to recover the untransformed centre. Without this the
+      // offset compounds and the element converges fully onto the pointer
+      // regardless of `strength`.
       const currentX = Number(gsap.getProperty(el, 'x')) || 0;
       const currentY = Number(gsap.getProperty(el, 'y')) || 0;
 
-      const centerX = rect.left + rect.width / 2 - currentX;
-      const centerY = rect.top + rect.height / 2 - currentY;
+      centerX = rect.left + rect.width / 2 - currentX;
+      centerY = rect.top + rect.height / 2 - currentY;
+    };
 
+    const onMouseMove = (e: MouseEvent) => {
       const offsetX = e.clientX - centerX;
       const offsetY = e.clientY - centerY;
 
@@ -60,10 +71,28 @@ export const Magnetic: React.FC<MagneticProps> = ({ children, strength = 0.35 })
       });
     };
 
+    const onScrollWhileHover = () => {
+      if (measureTick) return;
+      measureTick = true;
+      requestAnimationFrame(() => {
+        measureTick = false;
+        measureCenter();
+      });
+    };
+
+    const onMouseEnter = () => measureCenter();
+
+    // A page scroll under a hovering pointer changes the element's viewport
+    // position, so re-measure once per frame at most — and only while the
+    // effect is actually active.
+    el.addEventListener('mouseenter', onMouseEnter);
+    window.addEventListener('scroll', onScrollWhileHover, { passive: true });
     el.addEventListener('mousemove', onMouseMove);
     el.addEventListener('mouseleave', onMouseLeave);
 
     return () => {
+      el.removeEventListener('mouseenter', onMouseEnter);
+      window.removeEventListener('scroll', onScrollWhileHover);
       el.removeEventListener('mousemove', onMouseMove);
       el.removeEventListener('mouseleave', onMouseLeave);
       gsap.killTweensOf(el);

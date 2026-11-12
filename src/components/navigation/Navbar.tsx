@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { portfolioData } from '@/data/dummy';
 import { useCursor } from '@/context/CursorContext';
-import { getLenis } from '@/lib/lenis';
+import { getLenis, wakeLenis } from '@/lib/lenis';
 import { Menu, X } from 'lucide-react';
 
 interface NavbarProps {
@@ -22,22 +22,45 @@ export const Navbar: React.FC<NavbarProps> = ({ darkTheme = false }) => {
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Determine if we've scrolled past the light hero section
-      const heroEl = document.getElementById('hero');
+    // Header switches to dark when the light hero section is nearly out of
+    // view (its bottom passes within 80px of the viewport top).
+    //
+    // Reflow-free implementation: hero geometry is measured once and on
+    // resize only; the scroll callback just compares window.scrollY, which
+    // never forces layout. The old version called getBoundingClientRect()
+    // on *every scroll event* (a forced reflow per frame).
+    const heroEl = document.getElementById('hero');
+
+    let heroBottom = 0;
+    const measureHero = () => {
       if (heroEl) {
-        const heroBottom = heroEl.getBoundingClientRect().bottom;
-        // When hero bottom is near the top of viewport (e.g. within 60px), switch to dark theme
-        setIsScrolledDark(heroBottom <= 80);
-      } else {
-        setIsScrolledDark(window.scrollY > 400);
+        heroBottom = heroEl.offsetTop + heroEl.offsetHeight;
       }
     };
+    measureHero();
+    window.addEventListener('resize', measureHero, { passive: true });
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        if (heroEl) {
+          setIsScrolledDark(window.scrollY + 80 >= heroBottom);
+        } else {
+          setIsScrolledDark(window.scrollY > 400);
+        }
+      });
+    };
 
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', measureHero);
+    };
   }, []);
 
   const closeMenu = useCallback(() => setIsMobileOpen(false), []);
@@ -92,6 +115,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkTheme = false }) => {
       window.removeEventListener('resize', handleResize);
       document.body.style.overflow = previousOverflow;
       getLenis()?.start();
+      wakeLenis();
       trigger?.focus();
     };
   }, [isMobileOpen, closeMenu]);

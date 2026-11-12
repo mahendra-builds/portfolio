@@ -28,6 +28,9 @@ const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-mono',
   display: 'swap',
+  // The mono face is only used below the fold (code panel, small labels), so
+  // it must not compete with the display/body fonts for critical bandwidth.
+  preload: false,
 });
 
 const siteUrl = SITE_URL;

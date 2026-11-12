@@ -13,6 +13,7 @@ export const HeroSection: React.FC = () => {
   const { setCursorVariant, resetCursor } = useCursor();
   const turbulenceRef = useRef<SVGFETurbulenceElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const typoRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
   const { hero } = portfolioData;
@@ -28,9 +29,29 @@ export const HeroSection: React.FC = () => {
     return () => clearInterval(interval);
   }, [reducedMotion, hero.rotatingWords.length]);
 
+  // The hero's liquid filter reads are cached: measure once per hover instead
+  // of on every mousemove (a forced reflow per move), and throttle the
+  // feTurbulence updates — every baseFrequency change re-renders the SVG
+  // filter, which is CPU-bound, so ~12Hz keeps the feel while cutting work.
+  const heroRectRef = useRef<{ left: number; width: number; top: number; height: number } | null>(
+    null
+  );
+  const lastTurbulenceUpdate = useRef(0);
+
   const handleMouseEnter = () => {
     setCursorVariant('text');
     if (reducedMotion) return;
+    const target = typoRef.current;
+    if (target) {
+      const rect = target.getBoundingClientRect();
+      heroRectRef.current = {
+        left: rect.left,
+        width: rect.width,
+        top: rect.top,
+        height: rect.height,
+      };
+    }
+
     if (!turbulenceRef.current) return;
 
     gsap.fromTo(
@@ -42,20 +63,30 @@ export const HeroSection: React.FC = () => {
         attr: { baseFrequency: '0.00 0.00' },
         duration: 1.2,
         ease: 'power2.out',
+        overwrite: 'auto',
       }
     );
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (reducedMotion) return;
-    if (!turbulenceRef.current) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width;
-    const y = (e.clientY - rect.top) / rect.height;
+    if (reducedMotion || !turbulenceRef.current) return;
+
+    const now = performance.now();
+    if (now - lastTurbulenceUpdate.current < 80) return;
+    lastTurbulenceUpdate.current = now;
+
+    let x = 0.5;
+    let y = 0.5;
+    if (heroRectRef.current) {
+      const { left, width, top, height } = heroRectRef.current;
+      x = width > 0 ? (e.clientX - left) / width : 0.5;
+      y = height > 0 ? (e.clientY - top) / height : 0.5;
+    }
 
     gsap.to(turbulenceRef.current, {
       attr: { baseFrequency: `${0.02 + x * 0.03} ${0.05 + y * 0.04}` },
-      duration: 0.3,
+      duration: 0.4,
+      ease: 'power1.out',
       overwrite: 'auto',
     });
   };
@@ -106,6 +137,7 @@ export const HeroSection: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center text-center my-auto w-full max-w-7xl mx-auto">
         {/* Giant FULL STACK typography with interactive liquid wave distortion */}
         <div
+          ref={typoRef}
           className="w-full cursor-pointer liquid-hover"
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
