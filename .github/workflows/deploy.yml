@@ -63,22 +63,30 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      # Guard: without RESEND_API_KEY in the Production environment the contact
-      # form cannot deliver mail — it silently answers 503/502 to every
-      # visitor. Fail the deploy loudly instead of shipping a broken form.
+      # Guard: without RESEND_API_KEY, CONTACT_FROM and RECIPIENT_EMAIL in the
+      # Production environment the contact form cannot deliver mail — it
+      # answers 503 to every visitor. Fail the deploy loudly instead of
+      # shipping a broken form.
       - name: Verify email provider is configured for Production
         run: |
-          echo "Checking Vercel environment variables for RESEND_API_KEY (Production)..."
+          echo "Checking Vercel environment variables for the contact form (Production)..."
           ENV_LIST="$(npx vercel env ls --token="$VERCEL_TOKEN" 2>&1 || true)"
-          echo "$ENV_LIST" | grep -E "RESEND_API_KEY|WEB3FORMS_ACCESS_KEY" || true
+          echo "$ENV_LIST" | grep -E "RESEND_API_KEY|CONTACT_FROM|RECIPIENT_EMAIL" || true
 
-          if ! echo "$ENV_LIST" | grep "RESEND_API_KEY" | grep -q "Production"; then
-            echo "::error::RESEND_API_KEY is not set for the Production environment on Vercel."
-            echo "::error::Add it in Vercel → Project → Settings → Environment Variables (Production), then re-run this workflow."
+          MISSING=""
+          for VAR in RESEND_API_KEY CONTACT_FROM RECIPIENT_EMAIL; do
+            if ! echo "$ENV_LIST" | grep "$VAR" | grep -q "Production"; then
+              MISSING="$MISSING $VAR"
+            fi
+          done
+
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing for the Production environment on Vercel:$MISSING"
+            echo "::error::Add them in Vercel → Project → Settings → Environment Variables (Production), then re-run this workflow."
             exit 1
           fi
 
-          echo "RESEND_API_KEY is present for Production."
+          echo "RESEND_API_KEY, CONTACT_FROM and RECIPIENT_EMAIL are present for Production."
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -103,3 +111,30 @@ jobs:
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      # The guard above only proves the variables exist. This proves the
+      # deployed function actually sees them and is ready to deliver — so a
+      # green build can never be mistaken for a working contact form.
+      - name: Verify the live contact endpoint is delivery-ready
+        if: github.event_name == 'push'
+        run: |
+          echo "Probing https://mahiweb.in/api/contact ..."
+          BODY=""
+
+          # The custom domain can still point at the previous deployment for a
+          # few seconds, so retry briefly before failing the workflow.
+          for attempt in 1 2 3 4 5 6; do
+            BODY="$(curl -sS --max-time 30 https://mahiweb.in/api/contact || echo '')"
+            if [ -n "$BODY" ] && echo "$BODY" | grep -q '"deliveryReady":true'; then
+              echo "Response: $BODY"
+              echo "Live contact endpoint reports deliveryReady=true."
+              exit 0
+            fi
+            echo "Attempt $attempt: not ready yet."
+            sleep 10
+          done
+
+          echo "::error::The live contact endpoint is not delivery-ready."
+          echo "::error::Last response: ${BODY:-<no response>}"
+          echo "::error::Check RESEND_API_KEY, CONTACT_FROM and RECIPIENT_EMAIL in Vercel (Production), then redeploy."
+          exit 1

@@ -129,10 +129,9 @@ Copy `.env.example` to `.env.local` and fill it in.
 
 | Variable                        | Required | Purpose                                                      |
 | ------------------------------- | -------- | ------------------------------------------------------------ |
-| `RESEND_API_KEY`                | yes      | Primary server-side email delivery (100 emails/day free)     |
-| `WEB3FORMS_ACCESS_KEY`          | optional | Secondary server-side fallback (needs a paid plan)           |
+| `RESEND_API_KEY`                | yes      | Server-side email delivery via Resend (100 emails/day free)  |
+| `CONTACT_FROM`                  | yes      | Verified sender, e.g. `Mahendra Rajput <hello@mahiweb.in>`   |
 | `RECIPIENT_EMAIL`               | yes      | Inbox that receives contact form submissions                 |
-| `CONTACT_FROM`                  | optional | Verified sender for Resend                                   |
 | `NEXT_PUBLIC_SENTRY_DSN`        | optional | Sentry error monitoring                                      |
 | `SENTRY_AUTH_TOKEN`             | optional | Sentry source map uploads                                    |
 | `SENTRY_ORG` / `SENTRY_PROJECT` | optional | Sentry project metadata                                      |
@@ -141,18 +140,47 @@ Copy `.env.example` to `.env.local` and fill it in.
 ### How the contact form delivers mail
 
 The browser posts **only** to `/api/contact`. That route validates the submission, applies a
-honeypot, an origin check and a per-IP rate limit, then delivers server-side:
+honeypot, an origin check, a request-size limit and a per-IP rate limit, then delivers through
+**Resend** over a server-side API call.
 
-1. **Resend** — the primary path. Works on the free tier, so a free `RESEND_API_KEY` is all you need.
-2. **Web3Forms** — secondary fallback. Web3Forms blocks server-side calls on the free plan
-   (`403 — This method is not allowed`), so this path only works on a Pro plan with the server IP
-   safelisted.
+Resend is the only delivery provider. Web3Forms was removed because its API rejects server-side
+calls on the free tier (`403 — This method is not allowed`), so as a proxied fallback it could
+never deliver.
 
-If every provider fails, the visitor gets a visible error and a one-click mailto link — a message
-is never silently lost.
+Delivery is **fail-closed**: if `RESEND_API_KEY`, `CONTACT_FROM` or `RECIPIENT_EMAIL` is missing,
+the route answers `503 email_not_configured` instead of pretending to have sent the message. If
+the provider rejects the message the route answers `502 delivery_failed`. In both cases the
+visitor gets a visible error plus a one-click **mailto** link and a **copy-to-clipboard**
+fallback — a message is never silently lost.
+
+Retries are safe: every submission carries an `Idempotency-Key` derived from the submission id
+and the message content, so a double-click or a network retry cannot deliver twice. A transient
+`5xx` from Resend is retried once automatically.
+
+Check what a deployment actually has:
+
+```bash
+curl https://mahiweb.in/api/contact
+# { "provider": "resend", "deliveryReady": true, ... }
+```
+
+`deliveryReady` reports that all three variables are configured — the probe never calls Resend, so
+it costs no quota and leaks nothing. It does not prove the API key itself is valid; one real
+submission is what confirms that.
 
 > No delivery credential is ever sent to the browser. There must be **no** `NEXT_PUBLIC_` prefixed
-> copy of either key; `grep -r "WEB3FORMS" .next/static` should return nothing.
+> copy of the key; `grep -r "RESEND_API_KEY" .next/static` should return nothing.
+
+### Tests
+
+```bash
+npm test
+```
+
+The suite exercises the real route handler with a stubbed `fetch`, so it never touches the
+network and never sends an email. It covers the happy path and the outbound payload, empty and
+invalid input, honeypot hits, cross-origin requests, the request-size limit, the rate limiter,
+every missing-configuration and provider-failure path, and the frontend's response mapping.
 
 ---
 
@@ -211,7 +239,6 @@ src/
 - **GitHub** — [@mahendra-builds](https://github.com/mahendra-builds)
 - **WhatsApp** — [+91 9754137138](https://wa.me/919754137138)
 - **LinkedIn** — _add your profile URL in `src/data/real.ts`_
-- **Studio** — [drupal.codernaline.com](https://drupal.codernaline.com)
 
 > Still to fill in: your **LinkedIn URL**, and a **professional photo** — drop it at
 > `public/images/mahendra-editorial.jpg` and flip `about.showPortrait` to `true` in

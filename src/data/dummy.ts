@@ -109,17 +109,6 @@ export const dummyPortfolioData: PortfolioData = {
         kind: 'client',
       },
     ],
-    studio: {
-      id: '03',
-      name: 'Studio',
-      fullName: 'Studio',
-      url: '#',
-      tag: 'studio',
-      sector: 'Creative studio',
-      location: 'Pakistan',
-      work: 'Where I design and build.',
-      kind: 'studio',
-    },
     portraitImage:
       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80',
     showPortrait: true,

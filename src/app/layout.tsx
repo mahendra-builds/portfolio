@@ -140,11 +140,6 @@ const jsonLd = {
         'DevOps',
         'CI/CD',
       ],
-      worksFor: {
-        '@type': 'Organization',
-        name: 'Codernaline',
-        url: 'https://drupal.codernaline.com',
-      },
       sameAs: ['https://github.com/mahendra-builds', 'https://www.linkedin.com/in/mhndrtech'],
     },
     {

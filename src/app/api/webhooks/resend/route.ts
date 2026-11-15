@@ -131,13 +131,23 @@ const rememberEvent = (event: WebhookEvent) => {
   }
 };
 
-/** Status endpoint — lets you confirm the secret is present and see recent events. */
-export async function GET() {
+/**
+ * Status endpoint — confirms whether the signing secret is present.
+ *
+ * Recent events contain recipient addresses and Resend email ids, so they are
+ * only returned to a caller that presents the secret as a bearer token.
+ */
+export async function GET(req: Request) {
+  const secret = getSecret();
+  const authorization = req.headers.get('authorization') ?? '';
+  const presented = authorization.startsWith('Bearer ') ? authorization.slice(7).trim() : '';
+  const authorized = Boolean(secret) && presented.length > 0 && presented === secret;
+
   return NextResponse.json(
     {
       status: 'ok',
-      configured: Boolean(getSecret()),
-      recentEvents,
+      configured: Boolean(secret),
+      recentEvents: authorized ? recentEvents : [],
       note: 'recentEvents is per-instance and best-effort; the durable record is the Vercel log.',
     },
     { headers: { 'Cache-Control': 'no-store' } }
