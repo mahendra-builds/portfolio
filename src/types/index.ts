@@ -40,7 +40,7 @@ export interface ClientItem {
   sector: string;
   location: string;
   work: string;
-  kind: 'client' | 'studio';
+  kind: 'client';
 }
 
 export interface ReviewItem {
@@ -118,7 +118,6 @@ export interface PortfolioData {
       value: string;
     }[];
     clients: ClientItem[];
-    studio: ClientItem;
     portraitImage: string;
     showPortrait: boolean;
   };

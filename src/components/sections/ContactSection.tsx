@@ -4,12 +4,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { portfolioData } from '@/data/dummy';
 import { Mail, MapPin, Phone, Send, CheckCircle2, AlertCircle, Copy } from 'lucide-react';
 import { useCursor } from '@/context/CursorContext';
-
-interface ContactApiResponse {
-  success?: boolean;
-  error?: string;
-  code?: string;
-}
+import {
+  contactNetworkFailure,
+  resolveContactOutcome,
+  type ContactApiResponse,
+} from '@/lib/contact-response';
 
 const LinkedinIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' }) => (
   <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -28,6 +27,23 @@ const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-5 h-5' })
 );
 
 const STATUS_RESET_MS = 7000;
+
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 200;
+const MAX_MESSAGE_LENGTH = 5000;
+
+/**
+ * A stable id for one submission attempt. The server turns it into an
+ * Idempotency-Key, so a double-click or a retry of the same message cannot
+ * deliver twice. A fresh id is issued after every successful send.
+ */
+const createSubmissionId = (): string => {
+  const cryptoRef = globalThis.crypto;
+  if (cryptoRef && typeof cryptoRef.randomUUID === 'function') {
+    return cryptoRef.randomUUID();
+  }
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 12)}`;
+};
 
 export const ContactSection: React.FC = () => {
   const { contact } = portfolioData;
@@ -51,6 +67,7 @@ export const ContactSection: React.FC = () => {
   } | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const submittingRef = useRef(false);
+  const submissionIdRef = useRef<string>('');
 
   useEffect(
     () => () => {
@@ -136,39 +153,49 @@ export const ContactSection: React.FC = () => {
 
     const { name, email, message, company } = formData;
 
+    if (!submissionIdRef.current) {
+      submissionIdRef.current = createSubmissionId();
+    }
+    const submissionId = submissionIdRef.current;
+
     submittingRef.current = true;
     setStatus('submitting');
     setStatusMessage('Dispatching your message...');
     setMailtoHref(null);
 
-    try {
-      const res = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message, company }),
-      });
-
-      const data: ContactApiResponse = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data.success) {
-        if (data.code === 'email_not_configured') {
-          throw new Error('the form is not connected to an email service yet');
-        }
-        throw new Error(data.error || 'Delivery failed.');
-      }
-
-      setStatus('success');
-      setStatusMessage(`Thank you, ${name}! Your message was sent.`);
-      setFormData({ name: '', email: '', message: '', company: '' });
-      scheduleStatusReset();
-    } catch (err) {
-      const reason = err instanceof Error ? err.message : 'Delivery failed.';
+    const showError = (reason: string, offerFallback: boolean) => {
       setStatus('error');
       setStatusMessage(
         `Could not send automatically (${reason}). Use the button below to email me directly.`
       );
-      setMailtoHref(buildMailto(name, email, message));
+      setMailtoHref(offerFallback ? buildMailto(name, email, message) : null);
       setLastSubmission({ name, email, message });
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message, company, submissionId }),
+      });
+
+      const data: ContactApiResponse = await res.json().catch(() => ({}));
+
+      const outcome = resolveContactOutcome(res.status, data);
+
+      if (outcome.kind === 'success') {
+        setStatus('success');
+        setStatusMessage(`Thank you, ${name}! Your message was sent.`);
+        setFormData({ name: '', email: '', message: '', company: '' });
+        submissionIdRef.current = '';
+        scheduleStatusReset();
+        return;
+      }
+
+      showError(outcome.message, outcome.mailto);
+    } catch {
+      const outcome = contactNetworkFailure();
+      showError(outcome.message, outcome.mailto);
     } finally {
       submittingRef.current = false;
     }
@@ -263,6 +290,14 @@ export const ContactSection: React.FC = () => {
                   className="hover:text-brand-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
                 >
                   +91 97541 37138
+                </a>{' '}
+                ·{' '}
+                <a
+                  href={`mailto:${emailAddress}`}
+                  aria-label={`Email Mahendra Rajput at ${emailAddress}`}
+                  className="normal-case hover:text-brand-gold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                >
+                  {emailAddress}
                 </a>
               </span>
             </div>
@@ -302,6 +337,7 @@ export const ContactSection: React.FC = () => {
                   type="text"
                   required
                   aria-required="true"
+                  maxLength={MAX_NAME_LENGTH}
                   autoComplete="name"
                   value={formData.name}
                   onChange={handleChange}
@@ -323,6 +359,7 @@ export const ContactSection: React.FC = () => {
                   type="email"
                   required
                   aria-required="true"
+                  maxLength={MAX_EMAIL_LENGTH}
                   autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
@@ -344,6 +381,7 @@ export const ContactSection: React.FC = () => {
                   rows={4}
                   required
                   aria-required="true"
+                  maxLength={MAX_MESSAGE_LENGTH}
                   value={formData.message}
                   onChange={handleChange}
                   placeholder="Tell me about your project..."

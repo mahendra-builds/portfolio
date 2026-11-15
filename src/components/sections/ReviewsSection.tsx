@@ -49,7 +49,7 @@ export const ReviewsSection: React.FC = () => {
       className="relative w-full scroll-mt-24 bg-canvas-dark text-white py-16 sm:py-24 px-6 md:px-12 select-none border-t border-neutral-900"
     >
       <div className="max-w-7xl mx-auto space-y-12 sm:space-y-16">
-        <SectionHeading id="reviews-heading" title={reviews.sectionTitle} dark />
+        <SectionHeading id="reviews-heading" title={reviews.sectionTitle} dark align="center" />
 
         <div
           className="mx-auto max-w-3xl text-center"

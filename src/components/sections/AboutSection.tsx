@@ -100,7 +100,7 @@ export const AboutSection: React.FC = () => {
             CLIENTS WORKED WITH
           </h3>
 
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {about.clients.map((client) => (
               <li key={client.id}>
                 <a
@@ -124,29 +124,6 @@ export const AboutSection: React.FC = () => {
                 </a>
               </li>
             ))}
-
-            {/* Studio */}
-            <li>
-              <a
-                href={about.studio.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex h-full items-start justify-between gap-3 px-4 py-4 rounded-xl border border-brand-gold/30 bg-brand-gold/5 hover:bg-brand-gold/10 hover:border-brand-gold/50 transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
-              >
-                <span className="min-w-0">
-                  <span className="block text-sm font-semibold text-neutral-100">
-                    {about.studio.name}
-                    <span className="ml-2 rounded bg-brand-gold/20 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider text-brand-gold">
-                      Studio
-                    </span>
-                  </span>
-                  <span className="block text-[12px] text-neutral-400 mt-1 leading-snug">
-                    {about.studio.sector} · {about.studio.location}
-                  </span>
-                </span>
-                <ArrowUpRight className="w-4 h-4 shrink-0 text-brand-gold transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </a>
-            </li>
           </ul>
         </div>
       </div>
